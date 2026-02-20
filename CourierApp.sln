@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierApp.Server", "Courie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierApp.Client", "CourierApp.Client\CourierApp.Client.csproj", "{2C41EE40-0F91-44D6-A1C6-84212B19361A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierApp.Shared", "CourierApp.Shared\CourierApp.Shared.csproj", "{EF0C383F-78FC-441A-A80E-23D6C65896F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{2C41EE40-0F91-44D6-A1C6-84212B19361A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C41EE40-0F91-44D6-A1C6-84212B19361A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C41EE40-0F91-44D6-A1C6-84212B19361A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF0C383F-78FC-441A-A80E-23D6C65896F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF0C383F-78FC-441A-A80E-23D6C65896F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF0C383F-78FC-441A-A80E-23D6C65896F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF0C383F-78FC-441A-A80E-23D6C65896F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
