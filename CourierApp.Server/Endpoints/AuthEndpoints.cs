@@ -88,5 +88,11 @@ public static class AuthEndpoints
                 VehicleId = user.VehicleId
             });
         });
+
+        app.MapGet("auth/users/", async (CourierAppDbContext db) =>
+        {
+            List<User> users = await db.Users.ToListAsync();
+            return Results.Ok(users);
+        });
     }
 }
