@@ -27,5 +27,6 @@ app.UseHttpsRedirection();
 
 app.MapAuthEndpoints();
 app.MapVehicleEndpoints();
+app.MapWorkEndpoints();
 
 app.Run();
