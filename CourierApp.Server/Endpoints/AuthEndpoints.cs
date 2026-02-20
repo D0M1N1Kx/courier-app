@@ -14,7 +14,7 @@ public static class AuthEndpoints
         {
             var exists = await db.Users.AnyAsync(u => u.Email == dto.Email);
             if (exists)
-                return Results.Conflict("Ez az email cím már foglalt.");
+                return Results.Conflict("This email is already registered!");
 
             var user = new User
             {
