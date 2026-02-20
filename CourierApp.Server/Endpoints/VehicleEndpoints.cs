@@ -35,7 +35,7 @@ public static class VehicleEndpoints
             return vehicle == null ? Results.NotFound() : Results.Ok(vehicle);
         });
 
-        app.MapGet("/vehicles/", async (CourierAppDbContext db) =>
+        app.MapGet("/vehicles", async (CourierAppDbContext db) =>
         {
             List<Vehicle> vehicles = await db.Vehicles.ToListAsync();
             return Results.Ok(vehicles);

@@ -91,7 +91,16 @@ public static class AuthEndpoints
 
         app.MapGet("auth/users/", async (CourierAppDbContext db) =>
         {
-            List<User> users = await db.Users.ToListAsync();
+            var users = await db.Users.Select(u => new UserResponseDto
+            {
+                Id = u.Id,
+                Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                IsAdmin = u.IsAdmin,
+                VehicleId = u.VehicleId
+            }).ToListAsync();
+    
             return Results.Ok(users);
         });
     }
