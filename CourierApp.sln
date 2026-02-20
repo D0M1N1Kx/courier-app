@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierApp.Server", "CourierApp.Server\CourierApp.Server.csproj", "{4BB47ACD-93FF-441C-8758-BFC2CC714B88}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierApp.Client", "CourierApp.Client\CourierApp.Client.csproj", "{2C41EE40-0F91-44D6-A1C6-84212B19361A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{4BB47ACD-93FF-441C-8758-BFC2CC714B88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BB47ACD-93FF-441C-8758-BFC2CC714B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BB47ACD-93FF-441C-8758-BFC2CC714B88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C41EE40-0F91-44D6-A1C6-84212B19361A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C41EE40-0F91-44D6-A1C6-84212B19361A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C41EE40-0F91-44D6-A1C6-84212B19361A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C41EE40-0F91-44D6-A1C6-84212B19361A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
