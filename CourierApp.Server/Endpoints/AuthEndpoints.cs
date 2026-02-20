@@ -72,5 +72,21 @@ public static class AuthEndpoints
 
             return Results.Ok();
         });
+
+        app.MapGet("auth/users/{userId}", async (int userId, CourierAppDbContext db) =>
+        {
+            var user = await db.Users.FindAsync(userId);
+            if (user == null) return Results.NotFound();
+
+            return Results.Ok(new UserResponseDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                IsAdmin = user.IsAdmin,
+                VehicleId = user.VehicleId
+            });
+        });
     }
 }
