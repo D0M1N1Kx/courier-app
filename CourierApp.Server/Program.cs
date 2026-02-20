@@ -8,7 +8,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-DotNetEnv.Env.Load("../../.env");
+DotNetEnv.Env.Load("../.env");
 
 var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
