@@ -14,3 +14,5 @@ obj/
 Thumbs.db
 
 .env
+
+./CourierApp.Server/uploads/

@@ -1,6 +1,7 @@
 using CourierApp.Server.Models;
 using CourierApp.Shared;
 using CourierApp.Shared.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace CourierApp.Server.Endpoints;
 
@@ -36,7 +37,7 @@ public static class WorkEndpoints
             });
         });
 
-        app.MapPost("work/complete/{workId}", async (int workId, IFormFile proof,CourierAppDbContext db) =>
+        app.MapPost("/work/complete/{workId}", async (int workId, IFormFile proof,CourierAppDbContext db) =>
         {
             var work = await db.Works.FindAsync(workId);
             if (work == null) return Results.NotFound("Work not found!");
@@ -66,6 +67,23 @@ public static class WorkEndpoints
                 IsCompleted = work.IsCompleted,
                 ProofImagePath = work.ProofImagePath
             });
+        }).DisableAntiforgery();
+
+        app.MapGet("/work/user/{userId}", async (int userId, CourierAppDbContext db) =>
+        {
+            var works = await db.Works.Where(w => w.UserId == userId).Select(w => new WorkResponseDto
+            {
+                Id = w.Id,
+                UserId = w.UserId,
+                PackageCount = w.PackageCount,
+                PricePerPackage = w.PricePerPackage,
+                TotalEarned = w.TotalEarned,
+                StartTime = w.StartTime,
+                EndTime = w.EndTime,
+                IsCompleted = w.EndTime.HasValue
+            }).ToListAsync();
+            
+            return Results.Ok(works);
         });
     }
 }
