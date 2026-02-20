@@ -12,7 +12,7 @@ DotNetEnv.Env.Load("../.env");
 
 var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
-builder.Services.AddDbContext<UserDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") + dbPassword));
+builder.Services.AddDbContext<CourierAppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") + dbPassword));
 
 var app = builder.Build();
 

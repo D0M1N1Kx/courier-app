@@ -3,6 +3,7 @@ using CourierApp.Server.Models;
 using CourierApp.Shared.DTOs;
 using Microsoft.EntityFrameworkCore;
 using CourierApp.Shared;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CourierApp.Server.Endpoints;
 
@@ -10,7 +11,7 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        app.MapPost("auth/register", async (RegisterDto dto, UserDbContext db) =>
+        app.MapPost("auth/register", async (RegisterDto dto, CourierAppDbContext db) =>
         {
             var exists = await db.Users.AnyAsync(u => u.Email == dto.Email);
             if (exists)
@@ -38,7 +39,7 @@ public static class AuthEndpoints
             });
         });
 
-        app.MapPost("auth/login", async (LoginDto dto, UserDbContext db) =>
+        app.MapPost("auth/login", async (LoginDto dto, CourierAppDbContext db) =>
         {
             var user = await db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
 
@@ -54,6 +55,22 @@ public static class AuthEndpoints
                 IsAdmin = user.IsAdmin,
                 VehicleId = user.VehicleId
             });
+        });
+        
+        app.MapPut("auth/users/{userId}/vehicle", async (int userId, string vehicleId, CourierAppDbContext db) =>
+        {
+            var user = await db.Users.FindAsync(userId);
+            if (user == null)
+                return Results.NotFound("User not found!");
+            
+            var vehicle = await db.Vehicles.FindAsync(vehicleId);
+            if (vehicle == null)
+                return Results.NotFound("Vehicle not found!");
+
+            user.VehicleId = vehicleId;
+            await db.SaveChangesAsync();
+
+            return Results.Ok();
         });
     }
 }
