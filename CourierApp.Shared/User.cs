@@ -28,6 +28,8 @@ public class User
     
     public string? VehicleId { get; set; }
     
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    
     [ForeignKey(nameof(VehicleId))]
     public Vehicle? Vehicle { get; set; }
     
