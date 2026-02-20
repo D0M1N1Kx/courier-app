@@ -28,5 +28,11 @@ public static class VehicleEndpoints
             
             return Results.Ok(vehicle);
         });
+
+        app.MapGet("/vehicles/{VehicleId}", async (string VehicleId, CourierAppDbContext db) =>
+        {
+            var vehicle = await db.Vehicles.FindAsync(VehicleId);
+            return vehicle == null ? Results.NotFound() : Results.Ok(vehicle);
+        });
     }
 }
