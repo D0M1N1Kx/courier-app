@@ -30,4 +30,14 @@ public class User
     
     [ForeignKey(nameof(VehicleId))]
     public Vehicle? Vehicle { get; set; }
+    
+    public User() { }
+
+    public User(string email, string passwordHash, string firstName, string lastName)
+    {
+        Email = email;
+        PasswordHash = passwordHash;
+        FirstName = firstName;
+        LastName = lastName;
+    }
 }

@@ -23,4 +23,15 @@ public class Vehicle
     
     [Required]
     public int PackageCapacity { get; set; }
+    
+    public Vehicle() { }
+
+    public Vehicle(string vehicleId, string brand, string model, string licensePlate, int packageCapacity)
+    {
+        VehicleId = vehicleId;
+        Brand = brand;
+        Model = model;
+        LicensePlate = licensePlate;
+        PackageCapacity = packageCapacity;
+    }
 }
