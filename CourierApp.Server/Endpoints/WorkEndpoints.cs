@@ -35,5 +35,37 @@ public static class WorkEndpoints
                 IsCompleted = work.IsCompleted
             });
         });
+
+        app.MapPost("work/complete/{workId}", async (int workId, IFormFile proof,CourierAppDbContext db) =>
+        {
+            var work = await db.Works.FindAsync(workId);
+            if (work == null) return Results.NotFound("Work not found!");
+            if (work.IsCompleted) return Results.Conflict("Work already completed!");
+            
+            var uploadsDir = Path.Combine("uploads", "works");
+            Directory.CreateDirectory(uploadsDir);
+            var fileName = $"{workId}_{Guid.NewGuid()}{Path.GetExtension(proof.FileName)}";
+            var filePath = Path.Combine(uploadsDir, fileName);
+            
+            var stream = File.Create(filePath);
+            await proof.CopyToAsync(stream);
+            
+            work.EndTime = DateTime.UtcNow;
+            work.ProofImagePath = fileName;
+            await db.SaveChangesAsync();
+            
+            return Results.Ok(new WorkResponseDto
+            {
+                Id = work.Id,
+                UserId = work.UserId,
+                PackageCount = work.PackageCount,
+                PricePerPackage = work.PricePerPackage,
+                TotalEarned = work.TotalEarned,
+                StartTime = work.StartTime,
+                EndTime = work.EndTime,
+                IsCompleted = work.IsCompleted,
+                ProofImagePath = work.ProofImagePath
+            });
+        });
     }
 }
