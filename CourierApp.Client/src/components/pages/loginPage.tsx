@@ -36,7 +36,7 @@ export function LoginPage({ onNavigateToRegister }: LoginPageParams) {
   return (
     <>
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-3/4 max-w-xl bg-[#161616] border border-[#2A2A2A] rounded-lg px-10 pt-8 pb-8 flex flex-col items-center gap-6">
+        <div className="w-full sm:w-3/4 sm:max-w-xl bg-[#161616] border border-[#2A2A2A] rounded-lg px-10 pt-8 pb-8 flex flex-col items-center gap-6 mx-4">
           <h1
             className="text-center text-2xl md:text-3xl lg:text-4xl"
             style={{ fontFamily: "Pacifico, cursive" }}
