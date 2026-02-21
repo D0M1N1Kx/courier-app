@@ -2,9 +2,15 @@ import { useState } from 'react'
 import './App.css'
 import { LoginPage } from './components/pages/loginPage'
 import { RegisterPage } from './components/pages/registerPage';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-function App() {
+function AppContent() {
+  const { user } = useAuth();
   const [page, setPage] = useState<'login' | 'register'>('login');
+
+  if (user) {
+    return <div>Main Page - Logged in: {user.firstName}</div>
+  }
 
   return (
     <>
@@ -14,4 +20,10 @@ function App() {
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  )
+}
