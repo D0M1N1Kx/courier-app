@@ -51,11 +51,13 @@ export function LoginPage({ onNavigateToRegister }: LoginPageParams) {
             <input
               type="email"
               placeholder="your@email.com"
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-[#0E0E0E] border border-[#2A2A2A] rounded px-4 py-3 text-[#E8E0D0] text-sm outline-none focus:border-[#C8A96E]"
             />
             <input
               type="password"
               placeholder="••••••••"
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-[#0E0E0E] border border-[#2A2A2A] rounded px-4 py-3 text-[#E8E0D0] text-sm outline-none focus:border-[#C8A96E]"
             />
             <button
