@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { backend_url } from "../../config";
-import type { WorkResponseDto } from "../../types";
+import type { UserResponseDto, VehicleDto, WorkResponseDto } from "../../types";
 
 type DashboardPageParams = {
   onNavigateToLogin: () => void;
 };
 
-type Tab = "dashboard" | "new-delivery" | "history";
+type Tab = "dashboard" | "new-delivery" | "history" | "workers";
 
 export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   const { logout, user } = useAuth();
@@ -100,7 +100,6 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
                 Logistics
               </p>
             </div>
-
             {/* Sidebar tabs*/}
             <div
               onClick={() => setActiveTab("dashboard")}
@@ -112,7 +111,6 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             >
               Dashboard
             </div>
-
             <div
               onClick={() => setActiveTab("new-delivery")}
               className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
@@ -123,7 +121,6 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             >
               New Delivery
             </div>
-
             <div
               onClick={() => setActiveTab("history")}
               className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
@@ -135,6 +132,20 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
               History
             </div>
 
+            {/* ADMIN SECTION */}
+            <div className="border border-[#2A2A2A] my-2"></div>
+            {user?.isAdmin && (
+              <div
+                onClick={() => setActiveTab("workers")}
+                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+                  activeTab === "workers"
+                    ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                    : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                }`}
+              >
+                Workers
+              </div>
+            )}
             {/* User + logout */}
             <div className="mt-auto px-5 pt-5 border-t border-[#2A2A2A]">
               <p className="text-[13px] font-semibold text-[#E8E0D0]">
@@ -167,6 +178,7 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
               />
             )}
             {activeTab === "history" && <HistoryTab works={works} />}
+            {activeTab === "workers" && <WorkersTab works={works}/>}
           </div>
         </div>
       </div>
@@ -182,7 +194,10 @@ function DashboardTab({
   onCompleteWork: () => void;
 }) {
   const completedWorks = works.filter((w) => w.isCompleted);
-  const totalEarned = completedWorks.reduce((sum, w) => sum + (w.packageCount * w.pricePerPackage), 0);
+  const totalEarned = completedWorks.reduce(
+    (sum, w) => sum + w.packageCount * w.pricePerPackage,
+    0,
+  );
   const totalPackages = completedWorks.reduce(
     (sum, w) => sum + w.packageCount,
     0,
@@ -443,28 +458,48 @@ function NewDeliveryTab({
 }
 
 function HistoryTab({ works }: { works: WorkResponseDto[] }) {
-  const completedWorks = works.filter(w => w.isCompleted);
-  const totalEarned = completedWorks.reduce((sum, w) => sum + (w.packageCount * w.pricePerPackage), 0);
-  const activeWork = works.find(w => !w.isCompleted);
+  const completedWorks = works.filter((w) => w.isCompleted);
+  const totalEarned = completedWorks.reduce(
+    (sum, w) => sum + w.packageCount * w.pricePerPackage,
+    0,
+  );
+  const activeWork = works.find((w) => !w.isCompleted);
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-[9px] tracking-widest uppercase text-[#555555]">Payment History</p>
+      <p className="text-[9px] tracking-widest uppercase text-[#555555]">
+        Payment History
+      </p>
 
       {/* Stat cards */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
-          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">Total Received</p>
-          <p className="text-2xl font-black text-[#C8A96E]">${totalEarned.toLocaleString()}</p>
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
+            Total Received
+          </p>
+          <p className="text-2xl font-black text-[#C8A96E]">
+            ${totalEarned.toLocaleString()}
+          </p>
         </div>
         <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
-          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">Deliveries</p>
-          <p className="text-2xl font-black text-[#E8E0D0]">{completedWorks.length}</p>
-        </div>
-        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
-          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">Pending</p>
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
+            Deliveries
+          </p>
           <p className="text-2xl font-black text-[#E8E0D0]">
-            ${activeWork ? (activeWork.packageCount * activeWork.pricePerPackage).toLocaleString() : '0'}
+            {completedWorks.length}
+          </p>
+        </div>
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
+            Pending
+          </p>
+          <p className="text-2xl font-black text-[#E8E0D0]">
+            $
+            {activeWork
+              ? (
+                  activeWork.packageCount * activeWork.pricePerPackage
+                ).toLocaleString()
+              : "0"}
           </p>
         </div>
       </div>
@@ -472,7 +507,9 @@ function HistoryTab({ works }: { works: WorkResponseDto[] }) {
       {/* Table */}
       <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg overflow-hidden">
         <div className="px-5 py-4 border-b border-[#2A2A2A] flex items-center justify-between">
-          <p className="text-[9px] tracking-widest uppercase text-[#555555]">Payments</p>
+          <p className="text-[9px] tracking-widest uppercase text-[#555555]">
+            Payments
+          </p>
           {activeWork && (
             <span className="text-[9px] tracking-wider text-[#C8A96E] bg-[#1A1600] border border-[#3A3000] px-2 py-1 rounded">
               1 unpaid delivery
@@ -488,8 +525,18 @@ function HistoryTab({ works }: { works: WorkResponseDto[] }) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#2A2A2A]">
-                {["Date", "Paid By", "Deliveries", "Packages", "Amount", "Status"].map(h => (
-                  <th key={h} className="text-left text-[9px] tracking-widest uppercase text-[#444444] px-5 py-3 bg-[#0E0E0E]">
+                {[
+                  "Date",
+                  "Paid By",
+                  "Deliveries",
+                  "Packages",
+                  "Amount",
+                  "Status",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="text-left text-[9px] tracking-widest uppercase text-[#444444] px-5 py-3 bg-[#0E0E0E]"
+                  >
                     {h}
                   </th>
                 ))}
@@ -498,8 +545,12 @@ function HistoryTab({ works }: { works: WorkResponseDto[] }) {
             <tbody>
               <tr className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors">
                 <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">—</td>
-                <td className="px-5 py-4 text-[11px] text-[#555555]">Pending payment</td>
-                <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">{completedWorks.length}</td>
+                <td className="px-5 py-4 text-[11px] text-[#555555]">
+                  Pending payment
+                </td>
+                <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                  {completedWorks.length}
+                </td>
                 <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
                   {completedWorks.reduce((sum, w) => sum + w.packageCount, 0)}
                 </td>
@@ -514,6 +565,217 @@ function HistoryTab({ works }: { works: WorkResponseDto[] }) {
               </tr>
             </tbody>
           </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function WorkersTab({ works }: { works: WorkResponseDto[] }) {
+    const [workers, setWorkers] = useState<UserResponseDto[]>([]);
+    const [vehicles, setVehicles] = useState<VehicleDto[]>([]);
+    const completedWorks = works.filter((w) => w.isCompleted);
+    const totalEarned = completedWorks.reduce(
+      (sum, w) => sum + w.packageCount * w.pricePerPackage,
+      0,
+    );
+    const totalPackages = works.reduce((sum, w) => sum + w.packageCount, 0);
+    const allWorkers = workers.length;
+    const totalWorkers = workers.filter((w) => w.isAdmin == false).length;
+    const totalAdmins = workers.filter((w) => w.isAdmin == true).length;
+    const getVehicleById = (id: string) => vehicles.filter((v) => v.vehicleId == id);
+
+    const getWorkers = async () => {
+        try {
+            var res = await fetch(`${backend_url}/auth/users`, {
+                method: 'GET',
+            });
+
+            if (!res.ok) {
+                console.log('Failed to get users.');
+                return;
+            }
+
+            const data: UserResponseDto[] = await res.json();
+            setWorkers(data);
+        } catch {
+            console.log('Could not connect to the server.')
+        }
+    };
+
+    const getVehicles = async () => {
+        try {
+            var res = await fetch(`${backend_url}/vehicles`, {
+                method: 'GET',
+            });
+
+            if (!res.ok) {
+                console.log('Failed to get vehicles.');
+                return;
+            }
+
+            const data: VehicleDto[] = await res.json();
+            setVehicles(data);
+        } catch {
+            console.log('Failed to connect to the server.')
+        }
+    };
+
+    const handleApprove = () => {
+
+    };
+
+    useEffect(() => {
+        getWorkers();
+        getVehicles();
+    });
+
+    return (
+    <div className="flex flex-col gap-6">
+      <p className="text-[9px] tracking-widest uppercase text-[#555555]">
+        Workers Overview
+      </p>
+
+      {/* Stat cards */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
+            Total Workers
+          </p>
+          <p className="text-2xl font-black text-[#C8A96E]">
+            {allWorkers}
+          </p>
+        </div>
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
+            Workers
+          </p>
+          <p className="text-2xl font-black text-[#E8E0D0]">
+            {totalWorkers}
+          </p>
+        </div>
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
+            Admins
+          </p>
+          <p className="text-2xl font-black text-[#E8E0D0]">
+            {totalAdmins}
+          </p>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg">
+        <div className="px-5 py-4 border-b border-[#2A2A2A] flex items-center justify-between">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555]">
+            Workers
+          </p>
+        </div>
+
+        {allWorkers === 0 ? (
+          <p className="text-center text-[11px] tracking-widest uppercase text-[#333333] py-12">
+            No workers yet
+          </p>
+        ) : (
+            <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[#2A2A2A]">
+                {[
+                  "Id",
+                  "Email",
+                  "Firstname",
+                  "Lastname",
+                  "IsAdmin",
+                  "Approved",
+                  "VehicleID",
+                  "License Plate",
+                  "Total Earned",
+                  "Total Packages"
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="text-left text-[9px] tracking-widest uppercase text-[#444444] px-5 py-3 bg-[#0E0E0E]"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+  {[...workers]
+    .sort((a, b) => a.id - b.id)
+    .map((w) => {
+    const workerWorks = works.filter(work => work.userId === w.id);
+
+    const workerCompleted = workerWorks.filter(work => work.isCompleted);
+
+    const totalEarned = workerCompleted.reduce(
+      (sum, work) => sum + work.packageCount * work.pricePerPackage,
+      0
+    );
+
+    const totalPackages = workerCompleted.reduce(
+      (sum, work) => sum + work.packageCount,
+      0
+    );
+
+    const vehicle = vehicles.find(v => v.vehicleId === w.vehicleId);
+
+    return (
+      <tr
+        key={w.id}
+        className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors"
+      >
+        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+          {w.id}
+        </td>
+
+        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+          {w.email}
+        </td>
+
+        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+          {w.firstName}
+        </td>
+
+        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+          {w.lastName}
+        </td>
+
+        <td className="px-5 py-4">
+          <span className="text-[9px] tracking-wider text-[#C8A96E] bg-[#1A1600] border border-[#3A3000] px-2 py-1 rounded">
+            {w.isAdmin ? "Admin" : "Worker"}
+          </span>
+        </td>
+
+        <td className="px-5 py-4">
+          <span className="text-[9px] tracking-wider text-[#4CAF50] bg-[#0A1F0A] border border-[#2A4A2A] px-2 py-1 rounded" onClick={handleApprove}>
+            Approved {/* Need to implement in backend */}
+          </span>
+        </td>
+
+        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+          {w.vehicleId ?? "-"}
+        </td>
+
+        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+          {vehicle?.licensePlate ?? "-"}
+        </td>
+
+        <td className="px-5 py-4 text-[13px] font-black text-[#C8A96E]">
+          ${totalEarned.toLocaleString()}
+        </td>
+
+        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+          {totalPackages}
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
+          </table>
+          </div>
         )}
       </div>
     </div>
