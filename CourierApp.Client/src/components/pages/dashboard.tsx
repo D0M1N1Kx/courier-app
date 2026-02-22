@@ -6,8 +6,11 @@ type DashboardPageParams = {
   onNavigateToLogin: () => void;
 };
 
+type Tab = "dashboard" | "new-delivery" | "history";
+
 export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   const { logout, user } = useAuth();
+  const [activeTab, setActiveTab] = useState<Tab>("dashboard");
 
   return (
     <>
