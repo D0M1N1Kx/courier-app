@@ -21,26 +21,30 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
 
   const getUserWorks = async (userId: number) => {
     try {
-        var res = await fetch(`${backend_url}/work/user/${userId}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        });
+      var res = await fetch(`${backend_url}/work/user/${userId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
 
-        if (!res.ok) {
-            console.log("Failed request!")
-            return;
-        }
+      if (!res.ok) {
+        console.log("Failed request!");
+        return;
+      }
 
-        const works: WorkResponseDto[] = await res.json();
-        setWorks(works);
+      const works: WorkResponseDto[] = await res.json();
+      setWorks(works);
     } catch (e) {
-        console.log(e);
+      console.log(e);
     }
+  };
+
+  const handleCompleteWork = async () => {
+
   };
 
   useEffect(() => {
     if (user?.id) {
-        getUserWorks(user.id);
+      getUserWorks(user.id);
     }
   }, []);
 
@@ -116,9 +120,9 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
 
           {/* Content */}
           <div className="flex-1 p-8 overflow-y-auto">
-            {activeTab === "dashboard" && <DashboardTab works={works}/>}
+            {activeTab === "dashboard" && <DashboardTab works={works} onCompleteWork={handleCompleteWork}/>}
             {activeTab === "new-delivery" && <NewDeliveryTab />}
-            {activeTab === "history" && <HistoryTab works={works}/>}
+            {activeTab === "history" && <HistoryTab works={works} />}
           </div>
         </div>
       </div>
@@ -126,11 +130,14 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   );
 }
 
-function DashboardTab({ works }: { works: WorkResponseDto[] }) {
-    const completedWorks = works.filter((w) => w.isCompleted);
-    const totalEarned = completedWorks.reduce((sum, w) => sum + w.totalEarned, 0);
-    const totalPackages = completedWorks.reduce((sum, w) => sum + w.packageCount, 0);
-    const activeWork = works.find(w => !w.isCompleted);
+function DashboardTab({ works, onCompleteWork }: { works: WorkResponseDto[]; onCompleteWork: () => void }) {
+  const completedWorks = works.filter((w) => w.isCompleted);
+  const totalEarned = completedWorks.reduce((sum, w) => sum + w.totalEarned, 0);
+  const totalPackages = completedWorks.reduce(
+    (sum, w) => sum + w.packageCount,
+    0,
+  );
+  const activeWork = works.find((w) => !w.isCompleted);
 
   return (
     <>
@@ -142,8 +149,18 @@ function DashboardTab({ works }: { works: WorkResponseDto[] }) {
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "Total Earned", value: `$${totalEarned.toLocaleString()}`, sub: "all time", gold: true },
-            { label: "Deliveries", value: completedWorks.length.toString(), sub: "completed", gold: false },
+            {
+              label: "Total Earned",
+              value: `$${totalEarned.toLocaleString()}`,
+              sub: "all time",
+              gold: true,
+            },
+            {
+              label: "Deliveries",
+              value: completedWorks.length.toString(),
+              sub: "completed",
+              gold: false,
+            },
             {
               label: "Packages",
               value: totalPackages.toString(),
@@ -170,15 +187,24 @@ function DashboardTab({ works }: { works: WorkResponseDto[] }) {
 
         {/* Active work banner */}
         {activeWork && (
-            <div className="bg-[#1A1600] border border-[#C8A96E] rounded-lg p-4 flex items-center gap-4">
-                <div className="w-2 h-2 bg-[#C8A96E] rounded-full"/>
-                <p className="text-[10px] tracking-widest uppercase text-[#C8A96E] font-bold">Active Delivery</p>
-                <p className="text-[13px] text-[#E8E0D0] flex-1">
-                    Started at {new Date(activeWork.startTime).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}
-                    &nbsp;•&nbsp; {activeWork.packageCount} packages
-                    &nbsp;•&nbsp; ${activeWork.totalEarned.toLocaleString()}
-                </p>
-            </div>
+          <div className="bg-[#1A1600] border border-[#C8A96E] rounded-lg p-4 flex items-center gap-4">
+            <div className="w-2 h-2 bg-[#C8A96E] rounded-full" />
+            <p className="text-[10px] tracking-widest uppercase text-[#C8A96E] font-bold">
+              Active Delivery
+            </p>
+            <p className="text-[13px] text-[#E8E0D0] flex-1">
+              Started at{" "}
+              {new Date(activeWork.startTime).toLocaleTimeString("en", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              &nbsp;•&nbsp; {activeWork.packageCount} packages &nbsp;•&nbsp; $
+              {activeWork.totalEarned.toLocaleString()}
+            </p>
+            <button className="bg-[#C8A96E] text-[#0E0E0E] font-black text-[11px] tracking-widest uppercase px-4 py-2 rounded hover:bg-[#b8996e] transition-colors cursor-pointer flex-shrink-0" onClick={onCompleteWork}>
+              Complete
+            </button>
+          </div>
         )}
       </div>
     </>
