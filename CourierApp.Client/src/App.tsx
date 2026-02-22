@@ -3,13 +3,14 @@ import './App.css'
 import { LoginPage } from './components/pages/loginPage'
 import { RegisterPage } from './components/pages/registerPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { DashboardPage } from './components/pages/dashboard';
 
 function AppContent() {
   const { user } = useAuth();
   const [page, setPage] = useState<'login' | 'register'>('login');
 
   if (user) {
-    return <div>Main Page - Logged in: {user.firstName}</div>
+    return <DashboardPage onNavigateToLogin={() => setPage('login')} />;
   }
 
   return (
