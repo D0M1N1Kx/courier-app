@@ -35,6 +35,17 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
                 Logistics
               </p>
             </div>
+
+            {/* Sidebar tabs*/}
+            <div onClick={() => setActiveTab("dashboard")}
+                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+              activeTab === "dashboard"
+                ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+            }`}>
+                Dashboard
+            </div>
+
           </div>
         </div>
       </div>
