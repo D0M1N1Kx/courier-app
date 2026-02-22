@@ -87,13 +87,12 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             </div>
           </div>
 
-            {/* Content */}
-            <div className="flex-1 p-8 overflow-y-auto">
-                {activeTab === "dashboard" && <DashboardTab />}
-                {activeTab === "new-delivery" && <NewDeliveryTab />}
-                {activeTab === "history" && <HistoryTab />}
-            </div>
-
+          {/* Content */}
+          <div className="flex-1 p-8 overflow-y-auto">
+            {activeTab === "dashboard" && <DashboardTab />}
+            {activeTab === "new-delivery" && <NewDeliveryTab />}
+            {activeTab === "history" && <HistoryTab />}
+          </div>
         </div>
       </div>
     </>
@@ -101,42 +100,66 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
 }
 
 function DashboardTab() {
-    return (
-        <>
-            <div  className="flex flex-col gap-6">
-                <p className="text-[14px] tracking-widest uppercase text-[#555555]">Overview</p>
+  return (
+    <>
+      <div className="flex flex-col gap-6">
+        <p className="text-[14px] tracking-widest uppercase text-[#555555]">
+          Overview
+        </p>
 
-                {/* Stat cards */}
-                <div className="grid grid-cols-3 gap-4">
-                    {[
-                        { label: "Total Earned", value: "$0", sub: "all time", gold: true },
-                        { label: "Deliveries", value: "0", sub: "completed", gold: false },
-                        { label: "Packages", value: "0", sub: "delivered total", gold: false },
-                    ].map((s) => (
-                        <div key={s.label} className="bg-[#0E0E0E] border border-[#2A2A2A] rounded-lg p-5">
-                            <p className="text-[12px] tracking-widest uppercase text-[#555555] mb-2">{s.label}</p>
-                            <p className={`text-3xl font-black ${s.gold ? "text-[#C8A96E]" : "text-[#E8E0D0]"}`}>{s.value}</p>
-                            <p className="text-[12px] text-[#333333] mt-1">{s.sub}</p>
-                        </div>
-                    ))}
-                </div>
+        {/* Stat cards */}
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { label: "Total Earned", value: "$0", sub: "all time", gold: true },
+            { label: "Deliveries", value: "0", sub: "completed", gold: false },
+            {
+              label: "Packages",
+              value: "0",
+              sub: "delivered total",
+              gold: false,
+            },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className="bg-[#0E0E0E] border border-[#2A2A2A] rounded-lg p-5"
+            >
+              <p className="text-[12px] tracking-widest uppercase text-[#555555] mb-2">
+                {s.label}
+              </p>
+              <p
+                className={`text-3xl font-black ${s.gold ? "text-[#C8A96E]" : "text-[#E8E0D0]"}`}
+              >
+                {s.value}
+              </p>
+              <p className="text-[12px] text-[#333333] mt-1">{s.sub}</p>
             </div>
-        </>
-    )
+          ))}
+        </div>
+      </div>
+    </>
+  );
 }
 
 function NewDeliveryTab() {
-    return (
-        <>
-
-        </>
-    )
+  return (
+    <>
+      <div className="flex items-center justify-center h-full">
+        <p className="text-[#555555] text-sm tracking-widest uppercase">
+          New Delivery - coming soon
+        </p>
+      </div>
+    </>
+  );
 }
 
 function HistoryTab() {
-    return (
-        <>
-
-        </>
-    )
+  return (
+    <>
+      <div className="flex items-center justify-center h-full">
+        <p className="text-[#555555] text-sm tracking-widest uppercase">
+          History — coming soon
+        </p>
+      </div>
+    </>
+  );
 }
