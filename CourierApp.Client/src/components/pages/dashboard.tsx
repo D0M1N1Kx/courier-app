@@ -127,6 +127,11 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
 }
 
 function DashboardTab({ works }: { works: WorkResponseDto[] }) {
+    const completedWorks = works.filter((w) => w.isCompleted);
+    const totalEarned = completedWorks.reduce((sum, w) => sum + w.totalEarned, 0);
+    const totalPackages = completedWorks.reduce((sum, w) => sum + w.packageCount, 0);
+    const activeWork = works.find(w => !w.isCompleted);
+
   return (
     <>
       <div className="flex flex-col gap-6">
@@ -137,11 +142,11 @@ function DashboardTab({ works }: { works: WorkResponseDto[] }) {
         {/* Stat cards */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "Total Earned", value: "$0", sub: "all time", gold: true },
-            { label: "Deliveries", value: "0", sub: "completed", gold: false },
+            { label: "Total Earned", value: `$${totalEarned.toLocaleString()}`, sub: "all time", gold: true },
+            { label: "Deliveries", value: completedWorks.length.toString(), sub: "completed", gold: false },
             {
               label: "Packages",
-              value: "0",
+              value: totalPackages.toString(),
               sub: "delivered total",
               gold: false,
             },
