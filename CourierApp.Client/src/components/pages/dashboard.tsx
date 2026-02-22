@@ -46,6 +46,17 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
                 Dashboard
             </div>
 
+            <div
+            onClick={() => setActiveTab("new-delivery")}
+            className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+              activeTab === "new-delivery"
+                ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+            }`}
+          >
+            New Delivery
+          </div>
+
           </div>
         </div>
       </div>
