@@ -57,6 +57,17 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             New Delivery
           </div>
 
+          <div
+            onClick={() => setActiveTab("history")}
+            className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+              activeTab === "history"
+                ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+            }`}
+          >
+            History
+          </div>
+
           </div>
         </div>
       </div>
