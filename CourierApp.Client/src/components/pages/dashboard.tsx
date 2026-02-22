@@ -152,7 +152,10 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
           {/* Content */}
           <div className="flex-1 p-8 overflow-y-auto">
             {activeTab === "dashboard" && <DashboardTab works={works} onCompleteWork={handleCompleteWork}/>}
-            {activeTab === "new-delivery" && <NewDeliveryTab />}
+            {activeTab === "new-delivery" && <NewDeliveryTab userId={user!.id} onDeliveryStarted={() => {
+                getUserWorks(user!.id);
+                setActiveTab("dashboard");
+            }}/>}
             {activeTab === "history" && <HistoryTab works={works} />}
           </div>
         </div>
@@ -285,7 +288,33 @@ function DashboardTab({ works, onCompleteWork }: { works: WorkResponseDto[]; onC
   );
 }
 
-function NewDeliveryTab() {
+function NewDeliveryTab({ userId, onDeliveryStarted }: { userId: number; onDeliveryStarted: () => void }) {
+    const [packageCount, setPackageCount] = useState(15);
+    const [pricePerPackage, setPricePerPackage] = useState(3500);
+    const [error, setError] = useState('');
+
+    const estimated = packageCount * pricePerPackage;
+
+    const handleStart = async () => {
+        setError('');
+        try {
+            const res = await fetch(`${backend_url}/work/start`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, packageCount, pricePerPackage })
+            });
+
+            if (!res.ok) {
+                setError('Failed to start delivery.');
+                return;
+            }
+
+            onDeliveryStarted();
+        } catch {
+            setError('Could not connect to server.')
+        }
+    };
+
   return (
     <>
       <div className="flex items-center justify-center h-full">
