@@ -7,7 +7,7 @@ type LoginPageParams = {
 };
 
 export function LoginPage({ onNavigateToRegister }: LoginPageParams) {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,6 +27,9 @@ export function LoginPage({ onNavigateToRegister }: LoginPageParams) {
       }
 
       const user = await res.json();
+      if (!user.isApproved)
+        setError("Your account is not approved yet!");
+      
       login(user);
     } catch {
       setError("Could not connect to server.");

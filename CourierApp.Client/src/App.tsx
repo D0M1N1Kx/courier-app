@@ -9,7 +9,7 @@ function AppContent() {
   const { user } = useAuth();
   const [page, setPage] = useState<'login' | 'register'>('login');
 
-  if (user) {
+  if (user && user.isApproved) {
     return <DashboardPage onNavigateToLogin={() => setPage('login')} />;
   }
 
