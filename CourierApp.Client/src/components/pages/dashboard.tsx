@@ -237,6 +237,47 @@ function DashboardTab({ works, onCompleteWork }: { works: WorkResponseDto[]; onC
             </button>
           </div>
         )}
+
+        {/* Recent Deliveries */}
+        <div>
+            <p className="text-[12px] tracking-widest uppercase text-[#555555] mb-3">Recent Deliveries</p>
+            <div className="bg-[#0E0E0E] border border-[#2A2A2A] rounded-lg overflow-hidden">
+                <table className="w-full text-sm">
+                    <thead>
+                        <tr className="border-b border-[#2A2A2A]">
+                            {["Date", "Packages", "Price/Pkg", "Total", "Duration", "Status"].map(h => (
+                                <th key={h} className="text-left text-[9px] tracking-widest uppercase text-[#444444] px-4 py-3 bg-[#0E0E0E]">
+                                    {h}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {works.map(w => {
+                            const duration = w.endTime ? Math.round((new Date(w.endTime).getTime() - new Date(w.startTime).getTime()) / 60000) : null;
+                            return (
+                                <tr key={w.id} className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors">
+                                    <td className="px-4 py-3 text-[#E8E0D0]">
+                                        {new Date(w.startTime).toLocaleDateString('en', { month: '2-digit', day: '2-digit' })}
+                                        {" "}
+                                        {new Date(w.startTime).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}
+                                    </td>
+                                    <td className="px-4 py-3 text-[#E8E0D0]">{w.packageCount}</td>
+                                    <td className="px-4 py-3 text-[#E8E0D0]">{w.pricePerPackage.toLocaleString()}</td>
+                                    <td className="px-4 py-3 text-[#E8E0D0]">{w.totalEarned.toLocaleString()}</td>
+                                    <td className="px-4 py-3 text-[#E8E0D0]">{duration ? `${duration} min` : '-'}</td>
+                                    <td className="px-4 py-3">
+                                        {w.isCompleted
+                                            ? <span className="text-[9px] tracking-wider text-[#4CAF50] bg-[#0A1F0A] border border-[#2A4A2A] px-2 py-1 rounded">Completed</span>
+                                            : <span className="text-[9px] tracking-wider text-[#C8A96E] bg-[#1A1600] border border-[#3A3000] px-2 py-1 rounded">In Progress</span>}
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
       </div>
     </>
   );
