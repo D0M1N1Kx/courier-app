@@ -12,6 +12,11 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   const { logout, user } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
 
+  const handleLogout = () => {
+    logout();
+    onNavigateToLogin();
+  };
+
   return (
     <>
       <div className="min-h-screen flex items-center justify-center p-6">
