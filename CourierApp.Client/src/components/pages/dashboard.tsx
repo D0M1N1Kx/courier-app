@@ -7,7 +7,7 @@ type DashboardPageParams = {
   onNavigateToLogin: () => void;
 };
 
-type Tab = "dashboard" | "new-delivery" | "history" | "workers";
+type Tab = "dashboard" | "new-delivery" | "history" | "workers" | "vehicles";
 
 export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   const { logout, user } = useAuth();
@@ -146,6 +146,18 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
                 Workers
               </div>
             )}
+            {user?.isAdmin && (
+              <div
+                onClick={() => setActiveTab("vehicles")}
+                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+                  activeTab === "vehicles"
+                    ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                    : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                }`}
+              >
+                Vehicles
+              </div>
+            )}
             {/* User + logout */}
             <div className="mt-auto px-5 pt-5 border-t border-[#2A2A2A]">
               <p className="text-[13px] font-semibold text-[#E8E0D0]">
@@ -179,6 +191,7 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             )}
             {activeTab === "history" && <HistoryTab works={works} />}
             {activeTab === "workers" && <WorkersTab works={works} />}
+            {activeTab === "vehicles" && <VehiclesTab />}
           </div>
         </div>
       </div>
@@ -575,6 +588,10 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
   const { user } = useAuth();
   const [workers, setWorkers] = useState<UserResponseDto[]>([]);
   const [vehicles, setVehicles] = useState<VehicleDto[]>([]);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedVehicleId, setSelectedVehicleId] = useState("");
+  const [error, setError] = useState("");
   const completedWorks = works.filter((w) => w.isCompleted);
   const totalEarned = completedWorks.reduce(
     (sum, w) => sum + w.packageCount * w.pricePerPackage,
@@ -584,45 +601,36 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
   const allWorkers = workers.length;
   const totalWorkers = workers.filter((w) => w.isAdmin == false).length;
   const totalAdmins = workers.filter((w) => w.isAdmin == true).length;
-  const getVehicleById = (id: string) =>
-    vehicles.filter((v) => v.vehicleId == id);
-
   const getWorkers = async () => {
     try {
       var res = await fetch(`${backend_url}/auth/users`, {
         method: "GET",
       });
-
       if (!res.ok) {
         console.log("Failed to get users.");
         return;
       }
-
       const data: UserResponseDto[] = await res.json();
       setWorkers(data);
     } catch {
       console.log("Could not connect to the server.");
     }
   };
-
   const getVehicles = async () => {
     try {
       var res = await fetch(`${backend_url}/vehicles`, {
         method: "GET",
       });
-
       if (!res.ok) {
         console.log("Failed to get vehicles.");
         return;
       }
-
       const data: VehicleDto[] = await res.json();
       setVehicles(data);
     } catch {
       console.log("Failed to connect to the server.");
     }
   };
-
   const handleApprove = async (userId: number, to: boolean) => {
     try {
       var res = await fetch(
@@ -631,29 +639,54 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
           method: "PUT",
         },
       );
-
       if (!res.ok) {
         console.log(`Failed to update approval`);
         return;
       }
-
       await getWorkers();
     } catch {
       console.log("Could not connect to server.");
     }
   };
-
+  const handleAssignVehicle = async (userId: number, vehicleId: string) => {
+    try {
+      const res = await fetch(
+        `${backend_url}/auth/users/${userId}/vehicle?vehicleId=${encodeURIComponent(vehicleId)}`,
+        {
+          method: "PUT",
+        },
+      );
+      if (!res.ok) {
+        setError("Failed to assign vehicle.");
+        return;
+      }
+      setShowAssignModal(false);
+      getWorkers();
+    } catch {
+      setError("Could not connect to server.");
+    }
+  };
+  const openAssignModal = (userId: number, currentVehicleId?: string) => {
+    setSelectedUserId(userId);
+    setSelectedVehicleId(currentVehicleId || "");
+    setError("");
+    setShowAssignModal(true);
+  };
+  const onSubmitAssign = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedUserId !== null) {
+      handleAssignVehicle(selectedUserId, selectedVehicleId);
+    }
+  };
   useEffect(() => {
     getWorkers();
     getVehicles();
   }, []);
-
   return (
     <div className="flex flex-col gap-6">
       <p className="text-[9px] tracking-widest uppercase text-[#555555]">
         Workers Overview
       </p>
-
       {/* Stat cards */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
@@ -675,7 +708,6 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
           <p className="text-2xl font-black text-[#E8E0D0]">{totalAdmins}</p>
         </div>
       </div>
-
       {/* Table */}
       <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg">
         <div className="px-5 py-4 border-b border-[#2A2A2A] flex items-center justify-between">
@@ -683,7 +715,6 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
             Workers
           </p>
         </div>
-
         {allWorkers === 0 ? (
           <p className="text-center text-[11px] tracking-widest uppercase text-[#333333] py-12">
             No workers yet
@@ -704,6 +735,7 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
                     "License Plate",
                     "Total Earned",
                     "Total Packages",
+                    "Actions",
                   ].map((h) => (
                     <th
                       key={h}
@@ -721,26 +753,21 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
                     const workerWorks = works.filter(
                       (work) => work.userId === w.id,
                     );
-
                     const workerCompleted = workerWorks.filter(
                       (work) => work.isCompleted,
                     );
-
                     const totalEarned = workerCompleted.reduce(
                       (sum, work) =>
                         sum + work.packageCount * work.pricePerPackage,
                       0,
                     );
-
                     const totalPackages = workerCompleted.reduce(
                       (sum, work) => sum + work.packageCount,
                       0,
                     );
-
                     const vehicle = vehicles.find(
                       (v) => v.vehicleId === w.vehicleId,
                     );
-
                     return (
                       <tr
                         key={w.id}
@@ -749,53 +776,52 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
                         <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
                           {w.id}
                         </td>
-
                         <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
                           {w.email}
                         </td>
-
                         <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
                           {w.firstName}
                         </td>
-
                         <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
                           {w.lastName}
                         </td>
-
                         <td className="px-5 py-4">
                           <span className="text-[9px] tracking-wider text-[#C8A96E] bg-[#1A1600] border border-[#3A3000] px-2 py-1 rounded">
                             {w.isAdmin ? "Admin" : "Worker"}
                           </span>
                         </td>
-
                         <td className="px-5 py-4">
                           <span
                             onClick={() => handleApprove(w.id, !w.isApproved)}
                             className={`text-[9px] tracking-wider px-2 py-1 rounded cursor-pointer border whitespace-nowrap
-                                ${
-                                  w.isApproved
-                                    ? "text-[#4CAF50] bg-[#0A1F0A] border-[#2A4A2A]"
-                                    : "text-[#FF5252] bg-[#1F0A0A] border-[#4A2A2A]"
-                                }`}
+${
+  w.isApproved
+    ? "text-[#4CAF50] bg-[#0A1F0A] border-[#2A4A2A]"
+    : "text-[#FF5252] bg-[#1F0A0A] border-[#4A2A2A]"
+}`}
                           >
                             {w.isApproved ? "Approved" : "Not Approved"}
                           </span>
                         </td>
-
                         <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
                           {w.vehicleId ?? "-"}
                         </td>
-
                         <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
                           {vehicle?.licensePlate ?? "-"}
                         </td>
-
                         <td className="px-5 py-4 text-[13px] font-black text-[#C8A96E]">
                           ${totalEarned.toLocaleString()}
                         </td>
-
                         <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
                           {totalPackages}
+                        </td>
+                        <td className="px-5 py-4">
+                          <button
+                            onClick={() => openAssignModal(w.id, w.vehicleId)}
+                            className="bg-[#C8A96E] text-[#0E0E0E] font-black text-[9px] tracking-widest uppercase px-3 py-1 rounded hover:bg-[#b8996e] transition-colors cursor-pointer"
+                          >
+                            Assign Vehicle
+                          </button>
                         </td>
                       </tr>
                     );
@@ -805,6 +831,286 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
           </div>
         )}
       </div>
+      {showAssignModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-8 max-w-md w-full">
+            <h2 className="text-[14px] tracking-widest uppercase text-[#555555] mb-4">
+              Assign Vehicle
+            </h2>
+            <form onSubmit={onSubmitAssign} className="flex flex-col gap-4">
+              <select
+                value={selectedVehicleId}
+                onChange={(e) => setSelectedVehicleId(e.target.value)}
+                className="bg-[#0E0E0E] border border-[#2A2A2A] rounded px-4 py-2 text-[#E8E0D0]"
+              >
+                <option value="">None</option>
+                {vehicles.map((v) => (
+                  <option key={v.vehicleId} value={v.vehicleId}>
+                    {v.brand} {v.model} - {v.licensePlate} (Capacity: {v.packageCapacity})
+                  </option>
+                ))}
+              </select>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  className="flex-1 bg-[#C8A96E] text-[#0E0E0E] font-black text-[11px] tracking-widest uppercase py-2 rounded hover:bg-[#b8996e]"
+                >
+                  Assign
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAssignModal(false)}
+                  className="flex-1 bg-transparent border border-[#2A2A2A] text-[#555555] text-[11px] tracking-widest uppercase py-2 rounded hover:border-[#C8A96E] hover:text-[#C8A96E]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function VehiclesTab() {
+  const { user } = useAuth();
+  const [vehicles, setVehicles] = useState<VehicleDto[]>([]);
+  const [users, setUsers] = useState<UserResponseDto[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [brand, setBrand] = useState("");
+  const [model, setModel] = useState("");
+  const [licensePlate, setLicensePlate] = useState("");
+  const [packageCapacity, setPackageCapacity] = useState(0);
+  const [vehicleId, setVehicleId] = useState("");
+  const [error, setError] = useState("");
+  const totalVehicles = vehicles.length;
+  const totalCapacity = vehicles.reduce(
+    (sum, v) => sum + v.packageCapacity,
+    0
+  );
+  const getVehicles = async () => {
+    try {
+      const res = await fetch(`${backend_url}/vehicles`, {
+        method: "GET",
+      });
+      if (!res.ok) {
+        console.log("Failed to get vehicles.");
+        return;
+      }
+      const data: VehicleDto[] = await res.json();
+      setVehicles(data);
+    } catch {
+      console.log("Could not connect to server.");
+    }
+  };
+  const getUsers = async () => {
+    try {
+      const res = await fetch(`${backend_url}/auth/users`, {
+        method: "GET",
+      });
+      if (!res.ok) {
+        console.log("Failed to get users.");
+        return;
+      }
+      const data: UserResponseDto[] = await res.json();
+      setUsers(data);
+    } catch {
+      console.log("Could not connect to server.");
+    }
+  };
+  const handleAddVehicle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    try {
+      const res = await fetch(`${backend_url}/vehicles/add`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vehicleId, brand, model, licensePlate, packageCapacity }),
+      });
+      if (!res.ok) {
+        setError("Failed to add vehicle.");
+        return;
+      }
+      setShowModal(false);
+      getVehicles();
+    } catch {
+      setError("Could not connect to server.");
+    }
+  };
+  useEffect(() => {
+    getVehicles();
+    getUsers();
+  }, []);
+  return (
+    <div className="flex flex-col gap-6">
+      <p className="text-[9px] tracking-widest uppercase text-[#555555]">
+        Vehicles Overview
+      </p>
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
+            Total Vehicles
+          </p>
+          <p className="text-2xl font-black text-[#C8A96E]">
+            {totalVehicles}
+          </p>
+        </div>
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
+            Total Capacity
+          </p>
+          <p className="text-2xl font-black text-[#E8E0D0]">
+            {totalCapacity}
+          </p>
+        </div>
+      </div>
+      {/* Table */}
+      <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#2A2A2A]">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555]">
+            Vehicles
+          </p>
+        </div>
+        {totalVehicles === 0 ? (
+          <p className="text-center text-[11px] tracking-widest uppercase text-[#333333] py-12">
+            No vehicles yet
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[#2A2A2A]">
+                  {[
+                    "Vehicle ID",
+                    "Brand",
+                    "Model",
+                    "License Plate",
+                    "Package Capacity",
+                    "Owner"
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="text-left text-[9px] tracking-widest uppercase text-[#444444] px-5 py-3 bg-[#0E0E0E]"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[...vehicles]
+                  .sort((a, b) =>
+                    a.vehicleId.localeCompare(b.vehicleId)
+                  )
+                  .map((v) => {
+                    const owner = users.find((u) => u.vehicleId === v.vehicleId);
+                    return (
+                      <tr
+                        key={v.vehicleId}
+                        className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors"
+                      >
+                        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                          {v.vehicleId}
+                        </td>
+                        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                          {v.brand}
+                        </td>
+                        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                          {v.model}
+                        </td>
+                        <td className="px-5 py-4 text-[13px] font-black text-[#C8A96E]">
+                          {v.licensePlate}
+                        </td>
+                        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                          {v.packageCapacity}
+                        </td>
+                        <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                          {owner ? `${owner.firstName} ${owner.lastName}` : "-"}
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+      <button
+        onClick={() => setShowModal(true)}
+        className="bg-[#C8A96E] text-[#0E0E0E] font-black text-[11px] tracking-widest uppercase px-4 py-2 rounded hover:bg-[#b8996e] transition-colors cursor-pointer"
+      >
+        Add Vehicle
+      </button>
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-8 max-w-md w-full">
+            <h2 className="text-[14px] tracking-widest uppercase text-[#555555] mb-4">
+              Add New Vehicle
+            </h2>
+            <form onSubmit={handleAddVehicle} className="flex flex-col gap-4">
+              <input
+                type="text"
+                placeholder="Vehicle ID"
+                value={vehicleId}
+                onChange={(e) => setVehicleId(e.target.value)}
+                className="bg-[#0E0E0E] border border-[#2A2A2A] rounded px-4 py-2 text-[#E8E0D0]"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Brand"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                className="bg-[#0E0E0E] border border-[#2A2A2A] rounded px-4 py-2 text-[#E8E0D0]"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Model"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                className="bg-[#0E0E0E] border border-[#2A2A2A] rounded px-4 py-2 text-[#E8E0D0]"
+                required
+              />
+              <input
+                type="text"
+                placeholder="License Plate"
+                value={licensePlate}
+                onChange={(e) => setLicensePlate(e.target.value)}
+                className="bg-[#0E0E0E] border border-[#2A2A2A] rounded px-4 py-2 text-[#E8E0D0]"
+                required
+              />
+              <input
+                type="number"
+                placeholder="Package Capacity"
+                value={packageCapacity}
+                onChange={(e) => setPackageCapacity(Number(e.target.value))}
+                className="bg-[#0E0E0E] border border-[#2A2A2A] rounded px-4 py-2 text-[#E8E0D0]"
+                required
+              />
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  className="flex-1 bg-[#C8A96E] text-[#0E0E0E] font-black text-[11px] tracking-widest uppercase py-2 rounded hover:bg-[#b8996e]"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 bg-transparent border border-[#2A2A2A] text-[#555555] text-[11px] tracking-widest uppercase py-2 rounded hover:border-[#C8A96E] hover:text-[#C8A96E]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
