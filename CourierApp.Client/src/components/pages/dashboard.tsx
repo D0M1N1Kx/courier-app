@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { backend_url } from "../../config";
+import type { WorkResponseDto } from "../../types";
 
 type DashboardPageParams = {
   onNavigateToLogin: () => void;
@@ -10,12 +11,38 @@ type Tab = "dashboard" | "new-delivery" | "history";
 
 export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   const { logout, user } = useAuth();
+  const [works, setWorks] = useState<WorkResponseDto[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
 
   const handleLogout = () => {
     logout();
     onNavigateToLogin();
   };
+
+  const getUserWorks = async (userId: number) => {
+    try {
+        var res = await fetch(`${backend_url}/work/user/${userId}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+            console.log("Failed request!")
+            return;
+        }
+
+        const works: WorkResponseDto[] = await res.json();
+        setWorks(works);
+    } catch (e) {
+        console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+        getUserWorks(user.id);
+    }
+  }, []);
 
   return (
     <>
@@ -89,9 +116,9 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
 
           {/* Content */}
           <div className="flex-1 p-8 overflow-y-auto">
-            {activeTab === "dashboard" && <DashboardTab />}
+            {activeTab === "dashboard" && <DashboardTab works={works}/>}
             {activeTab === "new-delivery" && <NewDeliveryTab />}
-            {activeTab === "history" && <HistoryTab />}
+            {activeTab === "history" && <HistoryTab works={works}/>}
           </div>
         </div>
       </div>
@@ -99,7 +126,7 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   );
 }
 
-function DashboardTab() {
+function DashboardTab({ works }: { works: WorkResponseDto[] }) {
   return (
     <>
       <div className="flex flex-col gap-6">
@@ -152,7 +179,7 @@ function NewDeliveryTab() {
   );
 }
 
-function HistoryTab() {
+function HistoryTab({ works }: { works: WorkResponseDto[] }) {
   return (
     <>
       <div className="flex items-center justify-center h-full">
