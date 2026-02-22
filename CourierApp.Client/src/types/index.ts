@@ -8,6 +8,7 @@ export interface User {
     firstName: string;
     lastName: string;
     isAdmin: boolean;
+    isApproved: boolean;
     vehicleId?: string;
     createdAt: string;
 }
@@ -72,6 +73,7 @@ export interface UserResponseDto {
     firstName: string;
     lastName: string;
     isAdmin: boolean;
+    isApproved: boolean;
     vehicleId?: string;
 }
 

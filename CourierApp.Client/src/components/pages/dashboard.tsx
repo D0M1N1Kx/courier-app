@@ -628,7 +628,7 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
     useEffect(() => {
         getWorkers();
         getVehicles();
-    });
+    }, []);
 
     return (
     <div className="flex flex-col gap-6">
