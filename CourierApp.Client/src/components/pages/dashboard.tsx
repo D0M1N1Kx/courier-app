@@ -167,6 +167,19 @@ function DashboardTab({ works }: { works: WorkResponseDto[] }) {
             </div>
           ))}
         </div>
+
+        {/* Active work banner */}
+        {activeWork && (
+            <div className="bg-[#1A1600] border border-[#C8A96E] rounded-lg p-4 flex items-center gap-4">
+                <div className="w-2 h-2 bg-[#C8A96E] rounded-full"/>
+                <p className="text-[10px] tracking-widest uppercase text-[#C8A96E] font-bold">Active Delivery</p>
+                <p className="text-[13px] text-[#E8E0D0] flex-1">
+                    Started at {new Date(activeWork.startTime).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}
+                    &nbsp;•&nbsp; {activeWork.packageCount} packages
+                    &nbsp;•&nbsp; ${activeWork.totalEarned.toLocaleString()}
+                </p>
+            </div>
+        )}
       </div>
     </>
   );
