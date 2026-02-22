@@ -253,7 +253,9 @@ function DashboardTab({ works, onCompleteWork }: { works: WorkResponseDto[]; onC
                         </tr>
                     </thead>
                     <tbody>
-                        {works.map(w => {
+                        {works
+                            .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
+                            .map(w => {
                             const duration = w.endTime ? Math.round((new Date(w.endTime).getTime() - new Date(w.startTime).getTime()) / 60000) : null;
                             return (
                                 <tr key={w.id} className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors">
