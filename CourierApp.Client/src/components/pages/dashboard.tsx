@@ -39,36 +39,39 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   };
 
   const handleCompleteWork = async () => {
-    const activeWork = works.find(w => !w.isCompleted);
+    const activeWork = works.find((w) => !w.isCompleted);
     if (!activeWork) return;
 
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
 
     input.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (!file) return;
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
 
-        const formData = new FormData();
-        formData.append('proof', file);
+      const formData = new FormData();
+      formData.append("proof", file);
 
-        try {
-            const res = await fetch(`${backend_url}/work/complete/${activeWork.id}`, {
-                method: 'POST',
-                body: formData
-            });
+      try {
+        const res = await fetch(
+          `${backend_url}/work/complete/${activeWork.id}`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
 
-            if (!res.ok) {
-                console.log('Failed to complete work!');
-                return;
-            }
-
-            if (user?.id) getUserWorks(user.id);
-        } catch (e) {
-            console.log(e);
+        if (!res.ok) {
+          console.log("Failed to complete work!");
+          return;
         }
-    }
+
+        if (user?.id) getUserWorks(user.id);
+      } catch (e) {
+        console.log(e);
+      }
+    };
 
     input.click();
   };
@@ -151,11 +154,18 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
 
           {/* Content */}
           <div className="flex-1 p-8 overflow-y-auto">
-            {activeTab === "dashboard" && <DashboardTab works={works} onCompleteWork={handleCompleteWork}/>}
-            {activeTab === "new-delivery" && <NewDeliveryTab userId={user!.id} onDeliveryStarted={() => {
-                getUserWorks(user!.id);
-                setActiveTab("dashboard");
-            }}/>}
+            {activeTab === "dashboard" && (
+              <DashboardTab works={works} onCompleteWork={handleCompleteWork} />
+            )}
+            {activeTab === "new-delivery" && (
+              <NewDeliveryTab
+                userId={user!.id}
+                onDeliveryStarted={() => {
+                  getUserWorks(user!.id);
+                  setActiveTab("dashboard");
+                }}
+              />
+            )}
             {activeTab === "history" && <HistoryTab works={works} />}
           </div>
         </div>
@@ -164,9 +174,15 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   );
 }
 
-function DashboardTab({ works, onCompleteWork }: { works: WorkResponseDto[]; onCompleteWork: () => void }) {
+function DashboardTab({
+  works,
+  onCompleteWork,
+}: {
+  works: WorkResponseDto[];
+  onCompleteWork: () => void;
+}) {
   const completedWorks = works.filter((w) => w.isCompleted);
-  const totalEarned = completedWorks.reduce((sum, w) => sum + w.totalEarned, 0);
+  const totalEarned = completedWorks.reduce((sum, w) => sum + (w.packageCount * w.pricePerPackage), 0);
   const totalPackages = completedWorks.reduce(
     (sum, w) => sum + w.packageCount,
     0,
@@ -235,7 +251,10 @@ function DashboardTab({ works, onCompleteWork }: { works: WorkResponseDto[]; onC
               &nbsp;•&nbsp; {activeWork.packageCount} packages &nbsp;•&nbsp; $
               {activeWork.totalEarned.toLocaleString()}
             </p>
-            <button className="bg-[#C8A96E] text-[#0E0E0E] font-black text-[11px] tracking-widest uppercase px-4 py-2 rounded hover:bg-[#b8996e] transition-colors cursor-pointer flex-shrink-0" onClick={onCompleteWork}>
+            <button
+              className="bg-[#C8A96E] text-[#0E0E0E] font-black text-[11px] tracking-widest uppercase px-4 py-2 rounded hover:bg-[#b8996e] transition-colors cursor-pointer flex-shrink-0"
+              onClick={onCompleteWork}
+            >
               Complete
             </button>
           </div>
@@ -243,97 +262,260 @@ function DashboardTab({ works, onCompleteWork }: { works: WorkResponseDto[]; onC
 
         {/* Recent Deliveries */}
         <div>
-            <p className="text-[12px] tracking-widest uppercase text-[#555555] mb-3">Recent Deliveries</p>
-            <div className="bg-[#0E0E0E] border border-[#2A2A2A] rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead>
-                        <tr className="border-b border-[#2A2A2A]">
-                            {["Date", "Packages", "Price/Pkg", "Total", "Duration", "Status"].map(h => (
-                                <th key={h} className="text-left text-[9px] tracking-widest uppercase text-[#444444] px-4 py-3 bg-[#0E0E0E]">
-                                    {h}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {works
-                            .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
-                            .map(w => {
-                            const duration = w.endTime ? Math.round((new Date(w.endTime).getTime() - new Date(w.startTime).getTime()) / 60000) : null;
-                            return (
-                                <tr key={w.id} className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors">
-                                    <td className="px-4 py-3 text-[#E8E0D0]">
-                                        {new Date(w.startTime).toLocaleDateString('en', { month: '2-digit', day: '2-digit' })}
-                                        {" "}
-                                        {new Date(w.startTime).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}
-                                    </td>
-                                    <td className="px-4 py-3 text-[#E8E0D0]">{w.packageCount}</td>
-                                    <td className="px-4 py-3 text-[#E8E0D0]">{w.pricePerPackage.toLocaleString()}</td>
-                                    <td className="px-4 py-3 text-[#E8E0D0]">{w.totalEarned.toLocaleString()}</td>
-                                    <td className="px-4 py-3 text-[#E8E0D0]">{duration ? `${duration} min` : '-'}</td>
-                                    <td className="px-4 py-3">
-                                        {w.isCompleted
-                                            ? <span className="text-[9px] tracking-wider text-[#4CAF50] bg-[#0A1F0A] border border-[#2A4A2A] px-2 py-1 rounded">Completed</span>
-                                            : <span className="text-[9px] tracking-wider text-[#C8A96E] bg-[#1A1600] border border-[#3A3000] px-2 py-1 rounded">In Progress</span>}
-                                    </td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-            </div>
+          <p className="text-[12px] tracking-widest uppercase text-[#555555] mb-3">
+            Recent Deliveries
+          </p>
+          <div className="bg-[#0E0E0E] border border-[#2A2A2A] rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#2A2A2A]">
+                  {[
+                    "Date",
+                    "Packages",
+                    "Price/Pkg",
+                    "Total",
+                    "Duration",
+                    "Status",
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="text-left text-[9px] tracking-widest uppercase text-[#444444] px-4 py-3 bg-[#0E0E0E]"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {works
+                  .sort(
+                    (a, b) =>
+                      new Date(b.startTime).getTime() -
+                      new Date(a.startTime).getTime(),
+                  )
+                  .map((w) => {
+                    const duration = w.endTime
+                      ? Math.round(
+                          (new Date(w.endTime).getTime() -
+                            new Date(w.startTime).getTime()) /
+                            60000,
+                        )
+                      : null;
+                    return (
+                      <tr
+                        key={w.id}
+                        className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors"
+                      >
+                        <td className="px-4 py-3 text-[#E8E0D0]">
+                          {new Date(w.startTime).toLocaleDateString("en", {
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}{" "}
+                          {new Date(w.startTime).toLocaleTimeString("en", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </td>
+                        <td className="px-4 py-3 text-[#E8E0D0]">
+                          {w.packageCount}
+                        </td>
+                        <td className="px-4 py-3 text-[#E8E0D0]">
+                          {w.pricePerPackage.toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-[#E8E0D0]">
+                          {w.totalEarned.toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-[#E8E0D0]">
+                          {duration ? `${duration} min` : "-"}
+                        </td>
+                        <td className="px-4 py-3">
+                          {w.isCompleted ? (
+                            <span className="text-[9px] tracking-wider text-[#4CAF50] bg-[#0A1F0A] border border-[#2A4A2A] px-2 py-1 rounded">
+                              Completed
+                            </span>
+                          ) : (
+                            <span className="text-[9px] tracking-wider text-[#C8A96E] bg-[#1A1600] border border-[#3A3000] px-2 py-1 rounded">
+                              In Progress
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </>
   );
 }
 
-function NewDeliveryTab({ userId, onDeliveryStarted }: { userId: number; onDeliveryStarted: () => void }) {
-    const [packageCount, setPackageCount] = useState(15);
-    const [pricePerPackage, setPricePerPackage] = useState(3500);
-    const [error, setError] = useState('');
+function NewDeliveryTab({
+  userId,
+  onDeliveryStarted,
+}: {
+  userId: number;
+  onDeliveryStarted: () => void;
+}) {
+  const [packageCount, setPackageCount] = useState(15);
+  const [pricePerPackage, setPricePerPackage] = useState(3500);
+  const [error, setError] = useState("");
 
-    const estimated = packageCount * pricePerPackage;
+  const estimated = packageCount * pricePerPackage;
 
-    const handleStart = async () => {
-        setError('');
-        try {
-            const res = await fetch(`${backend_url}/work/start`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, packageCount, pricePerPackage })
-            });
+  const handleStart = async () => {
+    setError("");
+    try {
+      const res = await fetch(`${backend_url}/work/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, packageCount, pricePerPackage }),
+      });
 
-            if (!res.ok) {
-                setError('Failed to start delivery.');
-                return;
-            }
+      if (!res.ok) {
+        setError("Failed to start delivery.");
+        return;
+      }
 
-            onDeliveryStarted();
-        } catch {
-            setError('Could not connect to server.')
-        }
-    };
+      onDeliveryStarted();
+    } catch {
+      setError("Could not connect to server.");
+    }
+  };
 
   return (
-    <>
-      <div className="flex items-center justify-center h-full">
-        <p className="text-[#555555] text-sm tracking-widest uppercase">
-          New Delivery - coming soon
+    <div className="flex items-center justify-center h-full">
+      <div className="bg-[#0E0E0E] border border-[#2A2A2A] rounded-lg p-9 w-full max-w-md flex flex-col gap-6">
+        <p className="text-[10px] tracking-widest uppercase text-[#555555] font-semibold">
+          Start Delivery
         </p>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] tracking-widest uppercase text-[#555555]">
+            Number of Packages
+          </label>
+          <input
+            type="number"
+            min={1}
+            max={15}
+            value={packageCount}
+            onChange={(e) => setPackageCount(Number(e.target.value))}
+            className="bg-[#161616] border border-[#2A2A2A] rounded-md px-4 py-3 text-[#E8E0D0] text-[15px] outline-none focus:border-[#C8A96E] transition-colors"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-[10px] tracking-widest uppercase text-[#555555]">
+            Price per Package ($)
+          </label>
+          <input
+            type="number"
+            min={0}
+            value={pricePerPackage}
+            onChange={(e) => setPricePerPackage(Number(e.target.value))}
+            className="bg-[#161616] border border-[#2A2A2A] rounded-md px-4 py-3 text-[#E8E0D0] text-[15px] outline-none focus:border-[#C8A96E] transition-colors"
+          />
+        </div>
+
+        <div className="h-px bg-[#2A2A2A]" />
+
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-md px-4 py-4 flex items-center justify-between">
+          <span className="text-[10px] tracking-widest uppercase text-[#555555]">
+            Estimated Total
+          </span>
+          <span className="text-2xl font-black text-[#C8A96E]">
+            ${estimated.toLocaleString()}
+          </span>
+        </div>
+
+        {error && <p className="text-sm text-red-400">{error}</p>}
+
+        <button
+          onClick={handleStart}
+          className="w-full bg-[#C8A96E] text-[#0E0E0E] font-black text-[13px] tracking-widest uppercase py-3 rounded-md hover:bg-[#b8996e] transition-colors cursor-pointer"
+        >
+          Start Delivery
+        </button>
       </div>
-    </>
+    </div>
   );
 }
 
 function HistoryTab({ works }: { works: WorkResponseDto[] }) {
+  const completedWorks = works.filter(w => w.isCompleted);
+  const totalEarned = completedWorks.reduce((sum, w) => sum + (w.packageCount * w.pricePerPackage), 0);
+  const activeWork = works.find(w => !w.isCompleted);
+
   return (
-    <>
-      <div className="flex items-center justify-center h-full">
-        <p className="text-[#555555] text-sm tracking-widest uppercase">
-          History — coming soon
-        </p>
+    <div className="flex flex-col gap-6">
+      <p className="text-[9px] tracking-widest uppercase text-[#555555]">Payment History</p>
+
+      {/* Stat cards */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">Total Received</p>
+          <p className="text-2xl font-black text-[#C8A96E]">${totalEarned.toLocaleString()}</p>
+        </div>
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">Deliveries</p>
+          <p className="text-2xl font-black text-[#E8E0D0]">{completedWorks.length}</p>
+        </div>
+        <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">Pending</p>
+          <p className="text-2xl font-black text-[#E8E0D0]">
+            ${activeWork ? (activeWork.packageCount * activeWork.pricePerPackage).toLocaleString() : '0'}
+          </p>
+        </div>
       </div>
-    </>
+
+      {/* Table */}
+      <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#2A2A2A] flex items-center justify-between">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555]">Payments</p>
+          {activeWork && (
+            <span className="text-[9px] tracking-wider text-[#C8A96E] bg-[#1A1600] border border-[#3A3000] px-2 py-1 rounded">
+              1 unpaid delivery
+            </span>
+          )}
+        </div>
+
+        {completedWorks.length === 0 ? (
+          <p className="text-center text-[11px] tracking-widest uppercase text-[#333333] py-12">
+            No payments yet
+          </p>
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[#2A2A2A]">
+                {["Date", "Paid By", "Deliveries", "Packages", "Amount", "Status"].map(h => (
+                  <th key={h} className="text-left text-[9px] tracking-widest uppercase text-[#444444] px-5 py-3 bg-[#0E0E0E]">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors">
+                <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">—</td>
+                <td className="px-5 py-4 text-[11px] text-[#555555]">Pending payment</td>
+                <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">{completedWorks.length}</td>
+                <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                  {completedWorks.reduce((sum, w) => sum + w.packageCount, 0)}
+                </td>
+                <td className="px-5 py-4 text-[13px] font-black text-[#C8A96E]">
+                  ${totalEarned.toLocaleString()}
+                </td>
+                <td className="px-5 py-4">
+                  <span className="text-[9px] tracking-wider text-[#C8A96E] bg-[#1A1600] border border-[#3A3000] px-2 py-1 rounded">
+                    Unpaid
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
   );
 }
