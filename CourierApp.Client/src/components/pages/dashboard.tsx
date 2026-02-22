@@ -37,49 +37,89 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             </div>
 
             {/* Sidebar tabs*/}
-            <div onClick={() => setActiveTab("dashboard")}
-                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
-              activeTab === "dashboard"
-                ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
-                : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
-            }`}>
-                Dashboard
+            <div
+              onClick={() => setActiveTab("dashboard")}
+              className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+                activeTab === "dashboard"
+                  ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                  : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+              }`}
+            >
+              Dashboard
             </div>
 
             <div
-            onClick={() => setActiveTab("new-delivery")}
-            className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
-              activeTab === "new-delivery"
-                ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
-                : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
-            }`}
-          >
-            New Delivery
+              onClick={() => setActiveTab("new-delivery")}
+              className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+                activeTab === "new-delivery"
+                  ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                  : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+              }`}
+            >
+              New Delivery
+            </div>
+
+            <div
+              onClick={() => setActiveTab("history")}
+              className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+                activeTab === "history"
+                  ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                  : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+              }`}
+            >
+              History
+            </div>
+
+            {/* User + logout */}
+            <div className="mt-auto px-5 pt-5 border-t border-[#2A2A2A]">
+              <p className="text-[13px] font-semibold text-[#E8E0D0]">
+                {user?.firstName} {user?.lastName}
+              </p>
+              <p className="text-[9px] tracking-widest text-[#C8A96E] uppercase mb-3">
+                {user?.isAdmin ? "Admin" : "Courier"}
+              </p>
+              <button
+                onClick={handleLogout}
+                className="w-full border border-[#2A2A2A] text-[#555555] text-[10px] tracking-widest uppercase py-2 rounded hover: border-[#C8A96E] hover:text-[#C8A96E] transition-all bg-transparent cursor-pointer"
+              >
+                Log out
+              </button>
+            </div>
           </div>
 
-          <div
-            onClick={() => setActiveTab("history")}
-            className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
-              activeTab === "history"
-                ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
-                : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
-            }`}
-          >
-            History
-          </div>
+            {/* Content */}
+            <div className="flex-1 p-8 overflow-y-auto">
+                {activeTab === "dashboard" && <DashboardTab />}
+                {activeTab === "new-delivery" && <NewDeliveryTab />}
+                {activeTab === "history" && <HistoryTab />}
+            </div>
 
-          {/* User + logout */}
-          <div className="mt-auto px-5 pt-5 border-t border-[#2A2A2A]">
-                <p className="text-[13px] font-semibold text-[#E8E0D0]">{user?.firstName} {user?.lastName}</p>
-                <p className="text-[9px] tracking-widest text-[#C8A96E] uppercase mb-3">{user?.isAdmin ? "Admin" : "Courier"}</p>
-                <button onClick={handleLogout} className="w-full border border-[#2A2A2A] text-[#555555] text-[10px] tracking-widest uppercase py-2 rounded hover: border-[#C8A96E] hover:text-[#C8A96E] transition-all bg-transparent cursor-pointer">
-                    Log out
-                </button>
-          </div>
-
-          </div>
         </div>
       </div>
     </>
   );
+}
+
+function DashboardTab() {
+    return (
+        <>
+
+        </>
+    )
+}
+
+function NewDeliveryTab() {
+    return (
+        <>
+
+        </>
+    )
+}
+
+function HistoryTab() {
+    return (
+        <>
+            
+        </>
+    )
 }
