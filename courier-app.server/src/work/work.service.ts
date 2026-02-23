@@ -31,20 +31,14 @@ export class WorkService {
     }
 
     async completeWork(workId: number, file?: Express.Multer.File) {
-  const work = await this.workRepo.findOne({ where: { id: workId } });
-  if (!work) throw new NotFoundException('Work not found!');
-  if (work.isCompleted) throw new ConflictException('Work already completed!');
+      const work = await this.workRepo.findOne({ where: { id: workId } });
+      if (!work) throw new NotFoundException('Work not found!');
+      if (work.isCompleted) throw new ConflictException('Work already completed!');
 
-  work.endTime = new Date();
-  await this.workRepo.save(work);
-  return this.toResponse(work);
-}
-
-  work.endTime = new Date();
-  await this.workRepo.save(work);
-  return this.toResponse(work);
-}
-
+      work.endTime = new Date();
+      await this.workRepo.save(work);
+      return this.toResponse(work);
+    }
     async getUserWorks(userId: number) {
         const works = await this.workRepo.find({ where: { userId } });
         return works.map(this.toResponse);
