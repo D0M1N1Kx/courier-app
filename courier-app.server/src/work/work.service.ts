@@ -30,22 +30,23 @@ export class WorkService {
         return this.toResponse(work);
     }
 
-    async completeWork(workId: number, file: Express.Multer.File) {
-        const work = await this.workRepo.findOne({ where: { id: workId } });
-        if (!work) throw new NotFoundException('Work not found!');
-        if (work.isCompleted) throw new ConflictException('Work already completed!');
-        if (!file) throw new BadRequestException('Proof file is required!');
+    async completeWork(workId: number, file?: Express.Multer.File) {
+      const work = await this.workRepo.findOne({ where: { id: workId } });
+      if (!work) throw new NotFoundException('Work not found!');
+      if (work.isCompleted) throw new ConflictException('Work already completed!');
 
+      if (file) {
         const uploadsDir = path.join('uploads', 'works');
-        fs.mkdirSync(uploadsDir, { recursive: true });
-        const fileName = `${workId}_${Date.now()}${path.extname(file.originalname)}`;
-        fs.writeFileSync(path.join(uploadsDir, fileName), file.buffer);
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      const fileName = `${workId}_${Date.now()}${path.extname(file.originalname)}`;
+      fs.writeFileSync(path.join(uploadsDir, fileName), file.buffer);
+      work.proofImagePath = fileName;
+  }
 
-        work.endTime = new Date();
-        work.proofImagePath = fileName;
-        await this.workRepo.save(work);
-        return this.toResponse(work);
-    }
+  work.endTime = new Date();
+  await this.workRepo.save(work);
+  return this.toResponse(work);
+}
 
     async getUserWorks(userId: number) {
         const works = await this.workRepo.find({ where: { userId } });
