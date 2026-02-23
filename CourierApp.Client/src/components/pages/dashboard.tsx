@@ -585,19 +585,12 @@ function HistoryTab({ works }: { works: WorkResponseDto[] }) {
 }
 
 function WorkersTab({ works }: { works: WorkResponseDto[] }) {
-  const { user } = useAuth();
   const [workers, setWorkers] = useState<UserResponseDto[]>([]);
   const [vehicles, setVehicles] = useState<VehicleDto[]>([]);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState("");
   const [error, setError] = useState("");
-  const completedWorks = works.filter((w) => w.isCompleted);
-  const totalEarned = completedWorks.reduce(
-    (sum, w) => sum + w.packageCount * w.pricePerPackage,
-    0,
-  );
-  const totalPackages = works.reduce((sum, w) => sum + w.packageCount, 0);
   const allWorkers = workers.length;
   const totalWorkers = workers.filter((w) => w.isAdmin == false).length;
   const totalAdmins = workers.filter((w) => w.isAdmin == true).length;
@@ -875,7 +868,6 @@ ${
 }
 
 function VehiclesTab() {
-  const { user } = useAuth();
   const [vehicles, setVehicles] = useState<VehicleDto[]>([]);
   const [users, setUsers] = useState<UserResponseDto[]>([]);
   const [showModal, setShowModal] = useState(false);

@@ -7,7 +7,7 @@ type LoginPageParams = {
 };
 
 export function LoginPage({ onNavigateToRegister }: LoginPageParams) {
-  const { login, user } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
