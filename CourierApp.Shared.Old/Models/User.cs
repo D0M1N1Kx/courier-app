@@ -25,6 +25,8 @@ public class User
     public string LastName { get; set; } = string.Empty;
 
     public bool IsAdmin { get; set; } = false;
+
+    public bool IsApproved { get; set; } = false;
     
     public string? VehicleId { get; set; }
     

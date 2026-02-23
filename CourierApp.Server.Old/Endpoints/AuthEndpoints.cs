@@ -23,7 +23,8 @@ public static class AuthEndpoints
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
-                IsAdmin = false
+                IsAdmin = false,
+                IsApproved = false
             };
 
             db.Users.Add(user);
@@ -35,7 +36,8 @@ public static class AuthEndpoints
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                IsAdmin = user.IsAdmin
+                IsAdmin = user.IsAdmin,
+                IsApproved = user.IsApproved
             });
         });
 
@@ -53,6 +55,7 @@ public static class AuthEndpoints
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 IsAdmin = user.IsAdmin,
+                IsApproved = user.IsApproved,
                 VehicleId = user.VehicleId
             });
         });
@@ -85,6 +88,7 @@ public static class AuthEndpoints
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 IsAdmin = user.IsAdmin,
+                IsApproved = user.IsApproved,
                 VehicleId = user.VehicleId
             });
         });
@@ -98,10 +102,23 @@ public static class AuthEndpoints
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 IsAdmin = u.IsAdmin,
+                IsApproved = u.IsApproved,
                 VehicleId = u.VehicleId
             }).ToListAsync();
     
             return Results.Ok(users);
+        });
+
+        app.MapPut("auth/users/{userId}/approve/{boolean}", async (int userId, bool boolean,CourierAppDbContext db) =>
+        {
+            var user = await db.Users.FindAsync(userId);
+            if (user == null)
+                return Results.NotFound();
+
+            user.IsApproved = boolean;
+            await db.SaveChangesAsync();
+
+            return Results.Ok();
         });
     }
 }

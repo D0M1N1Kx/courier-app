@@ -8,6 +8,14 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
 DotNetEnv.Env.Load("../.env");
 
 var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
@@ -28,5 +36,6 @@ app.UseHttpsRedirection();
 app.MapAuthEndpoints();
 app.MapVehicleEndpoints();
 app.MapWorkEndpoints();
+app.UseCors();
 
 app.Run();

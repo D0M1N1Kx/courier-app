@@ -77,7 +77,7 @@ public static class WorkEndpoints
                 UserId = w.UserId,
                 PackageCount = w.PackageCount,
                 PricePerPackage = w.PricePerPackage,
-                TotalEarned = w.TotalEarned,
+                TotalEarned = w.PackageCount * w.PricePerPackage,
                 StartTime = w.StartTime,
                 EndTime = w.EndTime,
                 IsCompleted = w.EndTime.HasValue
