@@ -38,7 +38,7 @@ export class WorkController {
   })
   complete(
     @Param('workId', ParseIntPipe) workId: number,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.workService.completeWork(workId, file);
   }
