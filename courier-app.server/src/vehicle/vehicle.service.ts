@@ -2,12 +2,13 @@ import { ConflictException, Inject, Injectable, NotFoundException } from "@nestj
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Vehicle } from "../entities/vehicle.entity";
+import { VehicleDto } from "./dto/vehicle.dto";
 
 @Injectable()
 export class VehicleService {
     constructor(@InjectRepository(Vehicle) private repo: Repository<Vehicle>) {}
     
-    async add(dto: any) {
+    async add(dto: VehicleDto) {
         const exists = await this.repo.findOne({ where: { vehicleId: dto.vehicleId } });
         if (exists) throw new ConflictException('Vehicle already exists!');
         const vehicle = this.repo.create(dto);

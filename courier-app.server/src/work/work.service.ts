@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Work } from '../entities/work.entity';
@@ -34,6 +34,7 @@ export class WorkService {
         const work = await this.workRepo.findOne({ where: { id: workId } });
         if (!work) throw new NotFoundException('Work not found!');
         if (work.isCompleted) throw new ConflictException('Work already completed!');
+        if (!file) throw new BadRequestException('Proof file is required!');
 
         const uploadsDir = path.join('uploads', 'works');
         fs.mkdirSync(uploadsDir, { recursive: true });
