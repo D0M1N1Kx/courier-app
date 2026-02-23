@@ -8,7 +8,6 @@ import { AuthModule } from './auth/auth.module';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { WorkModule } from './work/work.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '../.env' }),
@@ -17,13 +16,10 @@ import { WorkModule } from './work/work.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        host: config.get('DB_HOST'),
-        port: config.get<number>('DB_PORT'),
-        username: config.get('DB_USERNAME'),
-        password: config.get('DB_PASSWORD'),
-        database: config.get('DB_NAME'),
+        url: config.get('DATABASE_URL'),
         entities: [User, Vehicle, Work],
-        synchronize: true, // for development, but in live false
+        synchronize: true,
+        ssl: { rejectUnauthorized: false },
       }),
     }),
     AuthModule,
