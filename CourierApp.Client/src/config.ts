@@ -1,1 +1,1 @@
-export const backend_url: string = 'https://courier-app-server-weld.vercel.app';
+export const backend_url: string = 'http://localhost:3000'; // https://courier-app-server-weld.vercel.app

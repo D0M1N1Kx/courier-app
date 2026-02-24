@@ -88,3 +88,14 @@ export interface WorkResponseDto {
     isCompleted: boolean;
     proofImagePath?: string;
 }
+
+export interface PaymentResponseDto {
+    id: number,
+    userId: number;
+    firstName: string;
+    lastname: string;
+    amount: number;
+    packageCount: number;
+    whoPaidUserId: number;
+    paidAt: Date;
+};

@@ -7,6 +7,8 @@ import { Work } from './entities/work.entity';
 import { AuthModule } from './auth/auth.module';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { WorkModule } from './work/work.module';
+import { Payment } from './entities/payment.entity';
+import { PaymentModule } from './payments/payment.module';
 
 @Module({
   imports: [
@@ -17,7 +19,7 @@ import { WorkModule } from './work/work.module';
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
         url: config.get('DATABASE_URL'),
-        entities: [User, Vehicle, Work],
+        entities: [User, Vehicle, Work, Payment],
         synchronize: true,
         ssl: { rejectUnauthorized: false },
       }),
@@ -25,6 +27,7 @@ import { WorkModule } from './work/work.module';
     AuthModule,
     VehicleModule,
     WorkModule,
+    PaymentModule,
   ],
   controllers: [],
   providers: [],

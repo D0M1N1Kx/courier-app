@@ -9,7 +9,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   app.enableCors({
-    origin: 'https://courier-app-red.vercel.app',
+    origin: 'http://localhost:5173', // https://courier-app-red.vercel.app
   });
 
   const config = new DocumentBuilder()

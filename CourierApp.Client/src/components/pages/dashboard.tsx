@@ -1,13 +1,24 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { backend_url } from "../../config";
-import type { UserResponseDto, VehicleDto, WorkResponseDto } from "../../types";
+import type {
+  PaymentResponseDto,
+  UserResponseDto,
+  VehicleDto,
+  WorkResponseDto,
+} from "../../types";
 
 type DashboardPageParams = {
   onNavigateToLogin: () => void;
 };
 
-type Tab = "dashboard" | "new-delivery" | "history" | "workers" | "vehicles";
+type Tab =
+  | "dashboard"
+  | "new-delivery"
+  | "history"
+  | "workers"
+  | "vehicles"
+  | "payments";
 
 export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   const { logout, user } = useAuth();
@@ -158,6 +169,18 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
                 Vehicles
               </div>
             )}
+            {user?.isAdmin && (
+              <div
+                onClick={() => setActiveTab("payments")}
+                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+                  activeTab === "payments"
+                    ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                    : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                }`}
+              >
+                Payments
+              </div>
+            )}
             {/* User + logout */}
             <div className="mt-auto px-5 pt-5 border-t border-[#2A2A2A]">
               <p className="text-[13px] font-semibold text-[#E8E0D0]">
@@ -192,6 +215,7 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             {activeTab === "history" && <HistoryTab works={works} />}
             {activeTab === "workers" && <WorkersTab />}
             {activeTab === "vehicles" && <VehiclesTab />}
+            {activeTab === "payments" && <PaymentsTab />}
           </div>
         </div>
       </div>
@@ -676,7 +700,7 @@ function WorkersTab() {
     getWorkers();
     getVehicles();
     fetch(`${backend_url}/work/all`)
-      .then(r => r.json())
+      .then((r) => r.json())
       .then(setAllWorks);
   }, []);
 
@@ -844,7 +868,8 @@ ${
                 <option value="">None</option>
                 {vehicles.map((v) => (
                   <option key={v.vehicleId} value={v.vehicleId}>
-                    {v.brand} {v.model} - {v.licensePlate} (Capacity: {v.packageCapacity})
+                    {v.brand} {v.model} - {v.licensePlate} (Capacity:{" "}
+                    {v.packageCapacity})
                   </option>
                 ))}
               </select>
@@ -883,10 +908,7 @@ function VehiclesTab() {
   const [vehicleId, setVehicleId] = useState("");
   const [error, setError] = useState("");
   const totalVehicles = vehicles.length;
-  const totalCapacity = vehicles.reduce(
-    (sum, v) => sum + v.packageCapacity,
-    0
-  );
+  const totalCapacity = vehicles.reduce((sum, v) => sum + v.packageCapacity, 0);
   const getVehicles = async () => {
     try {
       const res = await fetch(`${backend_url}/vehicles`, {
@@ -924,7 +946,13 @@ function VehiclesTab() {
       const res = await fetch(`${backend_url}/vehicles/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vehicleId, brand, model, licensePlate, packageCapacity }),
+        body: JSON.stringify({
+          vehicleId,
+          brand,
+          model,
+          licensePlate,
+          packageCapacity,
+        }),
       });
       if (!res.ok) {
         setError("Failed to add vehicle.");
@@ -951,17 +979,13 @@ function VehiclesTab() {
           <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
             Total Vehicles
           </p>
-          <p className="text-2xl font-black text-[#C8A96E]">
-            {totalVehicles}
-          </p>
+          <p className="text-2xl font-black text-[#C8A96E]">{totalVehicles}</p>
         </div>
         <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg p-5">
           <p className="text-[9px] tracking-widest uppercase text-[#555555] mb-2">
             Total Capacity
           </p>
-          <p className="text-2xl font-black text-[#E8E0D0]">
-            {totalCapacity}
-          </p>
+          <p className="text-2xl font-black text-[#E8E0D0]">{totalCapacity}</p>
         </div>
       </div>
       {/* Table */}
@@ -986,7 +1010,7 @@ function VehiclesTab() {
                     "Model",
                     "License Plate",
                     "Package Capacity",
-                    "Owner"
+                    "Owner",
                   ].map((h) => (
                     <th
                       key={h}
@@ -999,11 +1023,11 @@ function VehiclesTab() {
               </thead>
               <tbody>
                 {[...vehicles]
-                  .sort((a, b) =>
-                    a.vehicleId.localeCompare(b.vehicleId)
-                  )
+                  .sort((a, b) => a.vehicleId.localeCompare(b.vehicleId))
                   .map((v) => {
-                    const owner = users.find((u) => u.vehicleId === v.vehicleId);
+                    const owner = users.find(
+                      (u) => u.vehicleId === v.vehicleId,
+                    );
                     return (
                       <tr
                         key={v.vehicleId}
@@ -1108,6 +1132,174 @@ function VehiclesTab() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function PaymentsTab() {
+  const [workers, setWorkers] = useState<UserResponseDto[]>([]);
+  const [allWorks, setAllWorks] = useState<WorkResponseDto[]>([]);
+  const [payments, setPayments] = useState<PaymentResponseDto[]>([]);
+
+  const fetchAll = async () => {
+    const [workersRes, worksRes, paymentsRes] = await Promise.all([
+      fetch(`${backend_url}/auth/users`).then((r) => r.json()),
+      fetch(`${backend_url}/work/all`).then((r) => r.json()),
+      fetch(`${backend_url}/payment/all`).then((r) => r.json()),
+    ]);
+    setWorkers(workersRes);
+    setAllWorks(worksRes);
+    setPayments(paymentsRes);
+  };
+
+  const handlePay = async (userId: number) => {
+    const res = await fetch(`${backend_url}/payment/pay/${userId}`, {
+      method: "POST",
+    });
+    if (res.ok) fetchAll();
+  };
+
+  useEffect(() => {
+    fetchAll();
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <p className="text-[9px] tracking-widest uppercase text-[#555555]">
+        Payments
+      </p>
+
+      {/* Workers payment table */}
+      <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#2A2A2A]">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555]">
+            Unpaid Workers
+          </p>
+        </div>
+        <div className="overflow-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[#2A2A2A]">
+                {[
+                  "Name",
+                  "Completed Deliveries",
+                  "Packages",
+                  "Amount Due",
+                  "Action",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="text-center text-[9px] tracking-widest uppercase text-[#444444]"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {workers.map((w) => {
+                const workerWorks = allWorks.filter(
+                  (work) => work.userId === w.id && work.isCompleted,
+                );
+                const amount = workerWorks.reduce(
+                  (sum, work) => sum + work.packageCount * work.pricePerPackage,
+                  0,
+                );
+                const packages = workerWorks.reduce(
+                  (sum, work) => sum + work.packageCount,
+                  0,
+                );
+                return (
+                  <tr
+                    key={w.id}
+                    className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors"
+                  >
+                    <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                      {w.firstName} {w.lastName}
+                    </td>
+                    <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                      {workerWorks.length}
+                    </td>
+                    <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                      {packages}
+                    </td>
+                    <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                      ${amount.toLocaleString()}
+                    </td>
+                    <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                      <button
+                        onClick={() => handlePay(w.id)}
+                        disabled={workerWorks.length === 0}
+                        className="bg-[#C8A96E] disabled:opacity-30 disabled:cursor-not-allowed text-[$0E0E0E] font-black text-[9px] tracking-widest uppercase px-3 py-1 rounded hover:bg-[#b8996e] transition-colors cursor-pointer"
+                      >
+                        Pay Out
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {/* Payment history */}
+      <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#2A2A2A]">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555]">
+            Payment History
+          </p>
+        </div>
+        {payments.length === 0 ? (
+          <p className="text-center text-[11px] tracking-widest uppercase text-[#333333] py-12">
+            No payments yet
+          </p>
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[#2A2A2A]">
+                {["Date", "Worker", "Packages", "Amount", "Status"].map((h) => (
+                  <th
+                    key={h}
+                    className="text-left text-[9px] tracking-widest uppercase text-[#444444] px-5 py-3 bg-[#0E0E0E]"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {payments.map((p: any) => (
+                <tr
+                  key={p.id}
+                  className="border-b border-[#1A1A1A] last:border-0 hover:bg-[#1A1A1A] transition-colors"
+                >
+                  <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                    {new Date(p.paidAt).toLocaleDateString("en", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
+                  </td>
+                  <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                    {p.firstName} {p.lastName}
+                  </td>
+                  <td className="px-5 py-4 text-[13px] text-[#E8E0D0]">
+                    {p.packageCount}
+                  </td>
+                  <td className="px-5 py-4 text-[13px] font-black text-[#C8A96E]">
+                    ${p.amount.toLocaleString()}
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-[9px] tracking-wider text-[#4CAF50] bg-[#0A1F0A] border border-[#2A4A2A] px-2 py-1 rounded">
+                      Paid
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }
