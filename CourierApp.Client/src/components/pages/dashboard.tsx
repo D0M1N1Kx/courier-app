@@ -1141,6 +1141,13 @@ function PaymentsTab() {
     setPayments(paymentsRes);
   };
 
+  const handlePay = async (userId: number) => {
+    const res = await fetch(`${backend_url}/payment/pay/${userId}`, {
+      method: 'POST',
+    });
+    if (res.ok) fetchAll();
+  };
+
   return (
     <div className="flex flex-col gap-6">
 
