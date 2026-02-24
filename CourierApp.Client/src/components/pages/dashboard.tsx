@@ -1130,6 +1130,17 @@ function PaymentsTab() {
   const [allWorks, setAllWorks] = useState<WorkResponseDto[]>([]);
   const [payments, setPayments] = useState<PaymentResponseDto[]>([]);
 
+  const fetchAll = async () => {
+    const [workersRes, worksRes, paymentsRes] = await Promise.all([
+      fetch(`${backend_url}/auth/users`).then(r => r.json()),
+      fetch(`${backend_url}/work/all`).then(r => r.json()),
+      fetch(`${backend_url}/payment/all`).then(r => r.json()),
+    ]);
+    setWorkers(workersRes);
+    setAllWorks(worksRes);
+    setPayments(paymentsRes);
+  };
+
   return (
     <div className="flex flex-col gap-6">
 
