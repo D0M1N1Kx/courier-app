@@ -591,6 +591,7 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState("");
   const [error, setError] = useState("");
+  const [allWorks, setAllWorks] = useState<WorkResponseDto[]>([]);
   const allWorkers = workers.length;
   const totalWorkers = workers.filter((w) => w.isAdmin == false).length;
   const totalAdmins = workers.filter((w) => w.isAdmin == true).length;
@@ -674,7 +675,11 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
   useEffect(() => {
     getWorkers();
     getVehicles();
+    fetch(`${backend_url}/work/all`)
+      .then(r => r.json())
+      .then(setAllWorks);
   }, []);
+
   return (
     <div className="flex flex-col gap-6">
       <p className="text-[9px] tracking-widest uppercase text-[#555555]">
@@ -743,7 +748,7 @@ function WorkersTab({ works }: { works: WorkResponseDto[] }) {
                 {[...workers]
                   .sort((a, b) => a.id - b.id)
                   .map((w) => {
-                    const workerWorks = works.filter(
+                    const workerWorks = allWorks.filter(
                       (work) => work.userId === w.id,
                     );
                     const workerCompleted = workerWorks.filter(
