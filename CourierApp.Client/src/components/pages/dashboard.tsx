@@ -7,7 +7,7 @@ type DashboardPageParams = {
   onNavigateToLogin: () => void;
 };
 
-type Tab = "dashboard" | "new-delivery" | "history" | "workers" | "vehicles";
+type Tab = "dashboard" | "new-delivery" | "history" | "workers" | "vehicles" | "payments";
 
 export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
   const { logout, user } = useAuth();
@@ -156,6 +156,18 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
                 }`}
               >
                 Vehicles
+              </div>
+            )}
+            {user?.isAdmin && (
+              <div
+                onClick={() => setActiveTab("payments")}
+                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
+                  activeTab === "payments"
+                    ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                    : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                }`}
+              >
+                Payments
               </div>
             )}
             {/* User + logout */}
