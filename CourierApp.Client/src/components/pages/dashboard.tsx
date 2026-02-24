@@ -1152,7 +1152,27 @@ function PaymentsTab() {
 
   return (
     <div className="flex flex-col gap-6">
+      <p className="text-[9px] tracking-widest uppercase text-[#555555]">Payments</p>
 
+      {/* Workers payment table */}
+      <div className="bg-[#161616] border border-[#2A2A2A] rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#2A2A2A]">
+          <p className="text-[9px] tracking-widest uppercase text-[#555555]">Unpaid Workers</p>
+        </div>
+        <div className="overflow-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[#2A2A2A]">
+                {["Name", "Completed Deliveries", "Packages", "Amount Due", "Action"].map(h => (
+                  <th key={h} className="text-center text-[9px] tracking-widest uppercase text-[#444444]">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
     </div>
   )
 }
