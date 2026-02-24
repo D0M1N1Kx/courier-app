@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { WorkModule } from './work/work.module';
 import { Payment } from './entities/payment.entity';
+import { PaymentModule } from './payments/payment.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Payment } from './entities/payment.entity';
     AuthModule,
     VehicleModule,
     WorkModule,
+    PaymentModule,
   ],
   controllers: [],
   providers: [],
