@@ -1148,6 +1148,8 @@ function PaymentsTab() {
     if (res.ok) fetchAll();
   };
 
+  useEffect(() => { fetchAll(); }, []);
+
   return (
     <div className="flex flex-col gap-6">
 
