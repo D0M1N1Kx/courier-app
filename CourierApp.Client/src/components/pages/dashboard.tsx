@@ -204,6 +204,7 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             {activeTab === "history" && <HistoryTab works={works} />}
             {activeTab === "workers" && <WorkersTab />}
             {activeTab === "vehicles" && <VehiclesTab />}
+            {activeTab === "payments" && <PaymentsTab />}
           </div>
         </div>
       </div>
@@ -1122,4 +1123,12 @@ function VehiclesTab() {
       )}
     </div>
   );
+}
+
+function PaymentsTab() {
+  return (
+    <div className="flex flex-col gap-6">
+      
+    </div>
+  )
 }
