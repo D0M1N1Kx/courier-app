@@ -44,6 +44,11 @@ export class WorkService {
         return works.map(this.toResponse);
     }
 
+    async getAllWorks() {
+        const works = await this.workRepo.find();
+        return works.map(w => this.toResponse(w));
+    }
+
     private toResponse(work: Work) {
         return {
             id: work.id,

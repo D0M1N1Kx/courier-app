@@ -47,4 +47,9 @@ export class WorkController {
   getUserWorks(@Param('userId', ParseIntPipe) userId: number) {
     return this.workService.getUserWorks(userId);
   }
+
+  @Get('all')
+  getAllWorks() {
+    return this.workService.getAllWorks();
+  }
 }
