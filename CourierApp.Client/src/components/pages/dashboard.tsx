@@ -190,7 +190,7 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
               />
             )}
             {activeTab === "history" && <HistoryTab works={works} />}
-            {activeTab === "workers" && <WorkersTab works={works} />}
+            {activeTab === "workers" && <WorkersTab />}
             {activeTab === "vehicles" && <VehiclesTab />}
           </div>
         </div>
@@ -584,7 +584,7 @@ function HistoryTab({ works }: { works: WorkResponseDto[] }) {
   );
 }
 
-function WorkersTab({ works }: { works: WorkResponseDto[] }) {
+function WorkersTab() {
   const [workers, setWorkers] = useState<UserResponseDto[]>([]);
   const [vehicles, setVehicles] = useState<VehicleDto[]>([]);
   const [showAssignModal, setShowAssignModal] = useState(false);
