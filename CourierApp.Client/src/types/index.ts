@@ -96,6 +96,5 @@ export interface PaymentResponseDto {
     lastname: string;
     amount: number;
     packageCount: number;
-    whoPaidUserId: number;
     paidAt: Date;
 };

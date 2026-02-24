@@ -54,7 +54,6 @@ export class PaymentService {
             lastName: payment.lastName,
             amount: payment.amount,
             packageCount: payment.packageCount,
-            whoPaidUserId: payment.whoPaidUserId,
             paidAt: payment.paidAt,
         }
     }

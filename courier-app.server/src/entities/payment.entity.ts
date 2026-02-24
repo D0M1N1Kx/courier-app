@@ -20,9 +20,6 @@ export class Payment {
     @Column()
     packageCount: number;
 
-    @Column()
-    whoPaidUserId: number;
-
     @CreateDateColumn()
     paidAt: Date;
 }
