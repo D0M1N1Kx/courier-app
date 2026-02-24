@@ -35,7 +35,7 @@ export class PaymentService {
         await this.paymentRepo.save(payment);
         await this.workRepo.remove(works);
 
-        return payment;
+        return this.toResponse(payment);
     }
 
     async getPayments() {
@@ -44,5 +44,18 @@ export class PaymentService {
 
     async getUserPayments(userId: number) {
         return this.paymentRepo.find({ where: { userId }, order: { paidAt: 'DESC' } });
+    }
+
+    private toResponse(payment: Payment) {
+        return {
+            id: payment.id,
+            userId: payment.userId,
+            firstName: payment.firstName,
+            lastName: payment.lastName,
+            amount: payment.amount,
+            packageCount: payment.packageCount,
+            whoPaidUserId: payment.whoPaidUserId,
+            paidAt: payment.paidAt,
+        }
     }
 }

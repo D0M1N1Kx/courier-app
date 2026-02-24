@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { backend_url } from "../../config";
-import type { UserResponseDto, VehicleDto, WorkResponseDto } from "../../types";
+import type { PaymentResponseDto, UserResponseDto, VehicleDto, WorkResponseDto } from "../../types";
 
 type DashboardPageParams = {
   onNavigateToLogin: () => void;
@@ -1126,9 +1126,13 @@ function VehiclesTab() {
 }
 
 function PaymentsTab() {
+  const [workers, setWorkers] = useState<UserResponseDto[]>([]);
+  const [allWorks, setAllWorks] = useState<WorkResponseDto[]>([]);
+  const [payments, setPayments] = useState<PaymentResponseDto[]>([]);
+
   return (
     <div className="flex flex-col gap-6">
-      
+
     </div>
   )
 }
