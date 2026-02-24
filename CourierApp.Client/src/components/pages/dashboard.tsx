@@ -1201,11 +1201,11 @@ function PaymentsTab() {
                 const workerWorks = allWorks.filter(
                   (work) => work.userId === w.id && work.isCompleted,
                 );
-                const amount = allWorks.reduce(
+                const amount = workerWorks.reduce(
                   (sum, work) => sum + work.packageCount * work.pricePerPackage,
                   0,
                 );
-                const packages = allWorks.reduce(
+                const packages = workerWorks.reduce(
                   (sum, work) => sum + work.packageCount,
                   0,
                 );
