@@ -12,16 +12,19 @@ import { PaymentModule } from './payments/payment.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: '../.env' }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '../../.env' }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        url: config.get('DATABASE_URL'),
+        host: config.get<string>('DB_HOST'),
+        port: config.get<number>('DB_PORT'),
+        username: config.get<string>('DB_USERNAME'),
+        password: config.get<string>('DB_PASSWORD') || '',
+        database: config.get<string>('DB_NAME'),
         entities: [User, Vehicle, Work, Payment],
         synchronize: true,
-        ssl: { rejectUnauthorized: false },
       }),
     }),
     AuthModule,
