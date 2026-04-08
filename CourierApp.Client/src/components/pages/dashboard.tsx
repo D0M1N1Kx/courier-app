@@ -114,31 +114,28 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             {/* Sidebar tabs*/}
             <div
               onClick={() => setActiveTab("dashboard")}
-              className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
-                activeTab === "dashboard"
-                  ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
-                  : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
-              }`}
+              className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${activeTab === "dashboard"
+                ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                }`}
             >
               Dashboard
             </div>
             <div
               onClick={() => setActiveTab("new-delivery")}
-              className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
-                activeTab === "new-delivery"
-                  ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
-                  : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
-              }`}
+              className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${activeTab === "new-delivery"
+                ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                }`}
             >
               New Delivery
             </div>
             <div
               onClick={() => setActiveTab("history")}
-              className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
-                activeTab === "history"
-                  ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
-                  : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
-              }`}
+              className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${activeTab === "history"
+                ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                }`}
             >
               History
             </div>
@@ -148,11 +145,10 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             {user?.isAdmin && (
               <div
                 onClick={() => setActiveTab("workers")}
-                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
-                  activeTab === "workers"
-                    ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
-                    : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
-                }`}
+                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${activeTab === "workers"
+                  ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                  : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                  }`}
               >
                 Workers
               </div>
@@ -160,11 +156,10 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             {user?.isAdmin && (
               <div
                 onClick={() => setActiveTab("vehicles")}
-                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
-                  activeTab === "vehicles"
-                    ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
-                    : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
-                }`}
+                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${activeTab === "vehicles"
+                  ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                  : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                  }`}
               >
                 Vehicles
               </div>
@@ -172,11 +167,10 @@ export function DashboardPage({ onNavigateToLogin }: DashboardPageParams) {
             {user?.isAdmin && (
               <div
                 onClick={() => setActiveTab("payments")}
-                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${
-                  activeTab === "payments"
-                    ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
-                    : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
-                }`}
+                className={`px-5 py-3 text-[11px] tracking-widest uppercase cursor-pointer border-l-2 transition-all ${activeTab === "payments"
+                  ? "text-[#C8A96E] border-[#C8A96E] bg-[#1A1600]"
+                  : "text-[#555555] border-transparent hover:text-[#E8E0D0] hover:bg-[#1A1A1A]"
+                  }`}
               >
                 Payments
               </div>
@@ -348,10 +342,10 @@ function DashboardTab({
                   .map((w) => {
                     const duration = w.endTime
                       ? Math.round(
-                          (new Date(w.endTime).getTime() -
-                            new Date(w.startTime).getTime()) /
-                            60000,
-                        )
+                        (new Date(w.endTime).getTime() -
+                          new Date(w.startTime).getTime()) /
+                        60000,
+                      )
                       : null;
                     return (
                       <tr
@@ -411,7 +405,7 @@ function NewDeliveryTab({
   onDeliveryStarted: () => void;
 }) {
   const [packageCount, setPackageCount] = useState(15);
-  const [pricePerPackage, setPricePerPackage] = useState(3500);
+  const [pricePerPackage, setPricePerPackage] = useState(20000);
   const [error, setError] = useState("");
 
   const estimated = packageCount * pricePerPackage;
@@ -534,8 +528,8 @@ function HistoryTab({ works }: { works: WorkResponseDto[] }) {
             $
             {activeWork
               ? (
-                  activeWork.packageCount * activeWork.pricePerPackage
-                ).toLocaleString()
+                activeWork.packageCount * activeWork.pricePerPackage
+              ).toLocaleString()
               : "0"}
           </p>
         </div>
@@ -816,11 +810,10 @@ function WorkersTab() {
                           <span
                             onClick={() => handleApprove(w.id, !w.isApproved)}
                             className={`text-[9px] tracking-wider px-2 py-1 rounded cursor-pointer border whitespace-nowrap
-${
-  w.isApproved
-    ? "text-[#4CAF50] bg-[#0A1F0A] border-[#2A4A2A]"
-    : "text-[#FF5252] bg-[#1F0A0A] border-[#4A2A2A]"
-}`}
+${w.isApproved
+                                ? "text-[#4CAF50] bg-[#0A1F0A] border-[#2A4A2A]"
+                                : "text-[#FF5252] bg-[#1F0A0A] border-[#4A2A2A]"
+                              }`}
                           >
                             {w.isApproved ? "Approved" : "Not Approved"}
                           </span>
